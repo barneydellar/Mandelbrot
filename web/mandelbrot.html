@@ -1,0 +1,351 @@
+﻿<html>
+    <head>
+        <title>Mandelbrot</title>
+        <meta http-equiv=Content-Type content='text/html; charset=utf-8'>
+        <meta HTTP-EQUIV='Pragma' CONTENT='no-cache'>
+        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+        <script>
+
+            //-------------------------------------------------------------------------------------
+
+            var offset_x = -0.1089;
+            var offset_y = -0.89598;
+            var scale = 128;
+            var limit = 10000;
+
+            var half_h;
+            var half_w;
+            var full_h;
+            var full_w;
+            var one_over_min_half;
+            var context;
+
+            // We iterate from one palette to the next in small steps
+            var old_palette;
+            var new_palette;
+            var palette_counter = 0;
+            var palette_size = 5000;
+
+            var escape_array;
+
+            var interval_token = -1;
+
+            //-------------------------------------------------------------------------------------
+
+            function MandelbrotToColour(mand) {
+                return palette[mand];
+            }
+
+            //-------------------------------------------------------------------------------------
+
+            function BrightColour() {
+                return Math.floor(Math.random() * 100 + 155);
+            }
+
+            //-------------------------------------------------------------------------------------
+
+            function DimColour() {
+                return Math.floor(Math.random() * 155);
+            }
+
+            //-------------------------------------------------------------------------------------
+
+            function CreatePalette() {
+                // Set up the palette:
+                var palette = new Array(palette_size);
+                palette[0] = [0, 0, 0];
+
+                // Choose a colour (red, green, blue, cyan, magenta, yellow);
+                var bright_index = Math.floor(Math.random() * 6);
+
+                var r_func;
+                if (bright_index == 0 || bright_index == 3 || bright_index == 4) {
+                    r_func = BrightColour;
+                } else {
+                    r_func = DimColour;
+                }
+
+                var g_func;
+                if (bright_index == 1 || bright_index == 3 || bright_index == 5) {
+                    g_func = BrightColour;
+                } else {
+                    g_func = DimColour;
+                }
+
+                var b_func;
+                if (bright_index == 2 || bright_index == 4 || bright_index == 5) {
+                    b_func = BrightColour;
+                } else {
+                    b_func = DimColour;
+                }
+
+                for (i = 1; i < palette_size; i++) {
+                    palette[i] = [r_func(), g_func(), b_func()];
+                }
+
+                return palette;
+            }
+
+            //-------------------------------------------------------------------------------------
+
+            function GetCurrentPalette() {
+
+                var old_frac = 1 - (palette_counter / 100);
+                var new_frac = palette_counter / 100;
+
+                var size = old_palette.length;
+                var current_palette = new Array(size);
+
+                current_palette[0] = [0, 0, 0];
+
+                for (i = 1; i < size; i++) {
+
+                    current_palette[i] = [
+                        old_palette[i][0] * old_frac + new_palette[i][0] * new_frac,
+                        old_palette[i][1] * old_frac + new_palette[i][1] * new_frac,
+                        old_palette[i][2] * old_frac + new_palette[i][2] * new_frac
+                    ];
+                }
+
+                palette_counter++;
+
+                if (palette_counter >= 100) {
+                    palette_counter = 0;
+                    old_palette = new_palette;
+                    new_palette = CreatePalette();
+                }
+
+                return current_palette;
+            }
+
+            //-------------------------------------------------------------------------------------
+
+            function DrawCanvas(){
+
+                var canvasData = context.getImageData(0, 0, full_w, full_h);
+
+                var colour;
+                var canvas_index;
+
+                var palette = GetCurrentPalette();
+
+                for (i = 0; i < escape_array.length; i++) {
+
+                    colour = palette[escape_array[i]];
+
+                    canvas_index = 4*i;
+
+                    canvasData.data[canvas_index + 0] = colour[0];
+                    canvasData.data[canvas_index + 1] = colour[1];
+                    canvasData.data[canvas_index + 2] = colour[2];
+                    canvasData.data[canvas_index + 3] = 255;
+                }
+
+                context.putImageData(canvasData, 0, 0);
+
+            }
+
+            //-------------------------------------------------------------------------------------
+
+            function zoom_handler(event) {
+
+
+                var delta = 0;
+
+                if (!event) event = window.event;
+                // normalize the delta
+                if (event.wheelDelta) {
+                    // IE and Opera
+                    delta = event.wheelDelta / 60;
+                } else if (event.detail) {
+                    // W3C
+                    delta = -event.detail / 2;
+                }
+                if (delta > 0) {
+                    scale *= delta;
+                } else {
+                    scale /= -delta;
+                }
+
+                one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
+
+
+                fetch(
+                    "/Mandelbrot",
+                    {
+                        method: "POST",
+                        body: JSON.stringify({
+                            canvas_width: full_w,
+                            canvas_height: full_h,
+                            scale: scale,
+                            x: offset_x,
+                            y: offset_y,
+                            palette_size: palette_size,
+                            limit: limit
+                        }),
+                        headers: { 'Content-Type': 'application/json' }
+                    }
+                )
+                    .then(data => { return data.json() })
+                    .then(json_data => {
+                        StopColourLoop();
+                        escape_array = json_data;
+                        DrawCanvas();
+                        StartColourLoop();
+                    })
+                    .catch(function () {
+                        console.log("Failed to get all defect data");
+                    });
+            }
+
+            //-------------------------------------------------------------------------------------
+
+            function ViewToComplex(x, y) {
+
+                // Map (0->w) to (-1, 1);
+                var x_complex = offset_x + ((x - half_w) * one_over_min_half);
+                var y_complex = offset_y + ((y - half_h) * one_over_min_half);
+
+                return ([x_complex, y_complex]);
+            }
+
+            function click_handler(event) {
+
+                var complex = ViewToComplex(event.pageX, event.pageY);
+                offset_x = complex[0];
+                offset_y = complex[1];
+
+                fetch(
+                    "/Mandelbrot",
+                    {
+                        method: "POST",
+                        body: JSON.stringify({
+                            canvas_width: full_w,
+                            canvas_height: full_h,
+                            scale: scale,
+                            x: offset_x,
+                            y: offset_y,
+                            palette_size: palette_size,
+                            limit: limit
+                        }),
+                        headers: { 'Content-Type': 'application/json' }
+                    }
+                )
+                    .then(data => { return data.json() })
+                    .then(json_data => {
+                        StopColourLoop();
+                        escape_array = json_data;
+                        DrawCanvas();
+                        StartColourLoop();
+                    })
+                    .catch(function () {
+                        console.log("Failed to get all defect data");
+                    });
+            }
+
+            //-------------------------------------------------------------------------------------
+
+            function StopColourLoop() {
+
+                if (interval_token != -1) {
+                    clearInterval(interval_token);
+                    interval_token = -1;
+                }
+            }
+
+            //-------------------------------------------------------------------------------------
+
+            function StartColourLoop() {
+
+                // Start the tick function to change the colours
+                StopColourLoop();
+
+                interval_token = setInterval(function () { DrawCanvas(); }, 50);
+            }
+
+            //-------------------------------------------------------------------------------------
+
+            $(window).resize(function () {
+                SetUp();
+            });
+
+            //-------------------------------------------------------------------------------------
+
+            $(document).ready(function () {
+
+                var canvas = $("#MandelbrotCanvas")[0];
+                canvas.addEventListener('click', click_handler, false);
+
+                if (window.addEventListener) {
+                    document.addEventListener('DOMMouseScroll', zoom_handler, false);
+                }
+                document.onmousewheel = zoom_handler;
+
+                SetUp();
+            });
+
+            //-------------------------------------------------------------------------------------
+
+            function SetUp() {
+
+                StopColourLoop();
+
+                // Set up some initial variables
+                var canvas = $("#MandelbrotCanvas")[0];
+                canvas.width = window.innerWidth - 20;
+                canvas.height = window.innerHeight - 20;
+                full_w = canvas.width;
+                full_h = canvas.height;
+
+                // Create the array of escape values
+                escape_array = new Array(full_w * full_h);
+
+                // Grab the context
+                context = canvas.getContext("2d");
+
+                half_w = full_w * 0.5;
+                half_h = full_h * 0.5;
+                one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
+
+                old_palette = CreatePalette();
+                new_palette = CreatePalette();
+                palette_counter = 0;
+
+
+                fetch(
+                    "/Mandelbrot",
+                    {
+                        method: "POST",
+                        body: JSON.stringify({
+                            canvas_width: full_w,
+                            canvas_height: full_h,
+                            scale: scale,
+                            x: offset_x,
+                            y: offset_y,
+                            palette_size: palette_size,
+                            limit: limit
+                        }),
+                        headers: { 'Content-Type': 'application/json' }
+                    }
+                )
+                    .then(data => { return data.json() })
+                    .then(json_data => {
+                        escape_array = json_data;
+                        DrawCanvas();
+                        StartColourLoop();
+                    })
+                    .catch(function () {
+                        console.log("Failed to get all defect data");
+                    });
+            }
+
+            //-------------------------------------------------------------------------------------
+
+        </script>
+
+    </head>
+    <body>
+        <canvas id="MandelbrotCanvas">
+        </canvas>
+    </body>
+</html>
