@@ -1,14 +1,12 @@
 #include "stdafx.h"
 #include "Mandelbrot.h"
 
-Mandelbrot::Mandelbrot(const int canvas_width, const int canvas_height, const double scale, const double x, const double y, const int palette_size, const int limit) :
+Mandelbrot::Mandelbrot(const int canvas_width, const int canvas_height, const double scale, const double x, const double y) :
     canvas_width(canvas_width),
     canvas_height(canvas_height),
     scale(scale),
     offset_x(x),
     offset_y(y),
-    palette_size(palette_size),
-    limit(limit),
     half_w(canvas_width * 0.5),
     half_h(canvas_height * 0.5),
     one_over_min_half(1 / (scale * std::min(half_w, half_h)))
@@ -56,8 +54,6 @@ web::json::value Mandelbrot::JSON() const {
     const auto step_x = x_complex - origin_complex;
     const auto step_y = y_complex - origin_complex;
 
-    const auto multiplier = palette_size / (1.0*limit);
-
     std::vector<std::vector<int>> canvas;
     canvas.resize(canvas_height);
     for (auto& line : canvas) {
@@ -71,23 +67,14 @@ web::json::value Mandelbrot::JSON() const {
         std::execution::par,
         lines.cbegin(),
         lines.cend(),
-        [step_x, origin_complex, step_y, multiplier, this, &canvas](const int l)
+        [step_x, origin_complex, step_y, this, &canvas](const int l)
     {
         const auto complex_y_iter = origin_complex + (step_y * complex(l, 0));
 
         auto complex_x_iter = complex_y_iter;
 
         for (int i = 0; i < canvas_width; ++i) {
-
-            const auto mand = ComplexToMandelbrot(complex_x_iter);
-
-            int palette_index = 0;
-
-            if (mand != 0) {
-                palette_index = static_cast<int>(std::round(mand * multiplier));
-                palette_index = static_cast<int>(std::clamp<int>(palette_index, 1, palette_size - 1));
-            }
-            canvas[l][i] = palette_index;
+            canvas[l][i] = ComplexToMandelbrot(complex_x_iter);
             complex_x_iter += step_x;
         }
     }

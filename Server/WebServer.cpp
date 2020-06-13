@@ -137,12 +137,10 @@ void WebServer::HandlePost(http_request request)
                 const auto scale = GetDouble(request, request_json, L"scale");
                 const auto x = GetDouble(request, request_json, L"x");
                 const auto y = GetDouble(request, request_json, L"y");
-                const auto palette_size = GetInt(request, request_json, L"palette_size");
-                const auto limit = GetInt(request, request_json, L"limit");
 
                 if (request.absolute_uri().path() == L"/Mandelbrot") {
                     m_logger->info("(" + std::to_string(x) + ", " + std::to_string(y) + ") : " + std::to_string(scale));
-                    const Mandelbrot m(canvas_width, canvas_height, scale, x, y, palette_size, limit);
+                    const Mandelbrot m(canvas_width, canvas_height, scale, x, y);
                     const auto js = m.JSON();
                     m_logger->info("Done");
                     request.reply(status_codes::OK, js);
