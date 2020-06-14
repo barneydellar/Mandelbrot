@@ -14,7 +14,7 @@ Mandelbrot::Mandelbrot(const int canvas_width, const int canvas_height, const do
 }
 
 
-int Mandelbrot::ComplexToMandelbrot(const complex c) const {
+int Mandelbrot::ComplexToMandelbrot(const complex& c) const {
 
     complex z = 0;
     double new_square_r = 0;
@@ -28,7 +28,7 @@ int Mandelbrot::ComplexToMandelbrot(const complex c) const {
 
         const auto mag = new_square_r + new_square_i;
 
-        if (mag < 1e-9) {
+        if (mag < 1e-12) {
             return 0;
         }
 

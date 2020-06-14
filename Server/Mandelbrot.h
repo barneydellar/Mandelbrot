@@ -24,7 +24,7 @@ private:
 
     using complex = std::complex<double>;
 
-    [[nodiscard]] int ComplexToMandelbrot(const complex c) const;
+    [[nodiscard]] int ComplexToMandelbrot(const complex& c) const;
     [[nodiscard]] complex ViewToComplex(int x, int y) const;
 
 };

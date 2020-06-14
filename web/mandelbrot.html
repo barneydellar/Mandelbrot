@@ -19,6 +19,8 @@
             var one_over_min_half;
             var context;
 
+            var request_in_progress = false;
+
             // We iterate from one palette to the next in small steps
             var old_palette;
             var new_palette;
@@ -44,30 +46,32 @@
             //-------------------------------------------------------------------------------------
 
             function DimColour() {
-                return Math.floor(Math.random() * 150);
+                return Math.floor(Math.random() * 100);
             }
+
+            //-------------------------------------------------------------------------------------
 
             function RandomColour() {
 
-                // Choose a colour (red, green, blue);
-                var bright_index = Math.floor(Math.random() * 3);
+                // Choose a colour (red, green, blue, cyan, magenta, yellow, light, dark);
+                var bright_index = Math.floor(Math.random() * 8);
 
                 var r_func;
-                if (bright_index == 0) {
+                if (bright_index == 0 || bright_index == 3 || bright_index == 4 || bright_index == 6) {
                     r_func = BrightColour;
                 } else {
                     r_func = DimColour;
                 }
 
                 var g_func;
-                if (bright_index == 1) {
+                if (bright_index == 1 || bright_index == 3 || bright_index == 5 || bright_index == 6) {
                     g_func = BrightColour;
                 } else {
                     g_func = DimColour;
                 }
 
                 var b_func;
-                if (bright_index == 2) {
+                if (bright_index == 2 || bright_index == 4 || bright_index == 5 || bright_index == 6) {
                     b_func = BrightColour;
                 } else {
                     b_func = DimColour;
@@ -78,21 +82,29 @@
 
             //-------------------------------------------------------------------------------------
 
+            function getRndBias(min, max, bias, influence) {
+                var rnd = Math.random() * (max - min) + min,
+                    mix = Math.random() * influence;
+                return Math.round(rnd * (1 - mix) + bias * mix);
+            }
+
+            //-------------------------------------------------------------------------------------
+
             function CreatePalette() {
                 // Set up the palette:
                 var palette = new Array(palette_size);
-                palette[0] = [0, 0, 0];
+                palette[0] = [0, 0, 0]
 
                 start_colour = RandomColour();
                 end_colour = RandomColour();
 
-                loop_size = 20;
+                loop_size = getRndBias(1, 100, 3, 1);
 
                 for (i = 1; i < palette_size; i += loop_size) {
 
                     for (j = 0; j < loop_size; j++) {
 
-                        if (j >= palette_size) {
+                        if (i+j >= palette_size) {
                             break;
                         }
 
@@ -115,15 +127,11 @@
 
             function GetColour(palette, palette_length, mandelbrot) {
 
-                if (mandelbrot == 0) {
-                    return [0, 0, 0];
-                }
-
                 if (mandelbrot < palette_length-1) {
                     return palette[mandelbrot];
                 }
 
-                return [255, 223, 0];
+                return RandomColour();
             }
 
             //-------------------------------------------------------------------------------------
@@ -136,9 +144,7 @@
                 var size = old_palette.length;
                 var current_palette = new Array(size);
 
-                current_palette[0] = [0, 0, 0];
-
-                for (i = 1; i < size; i++) {
+                for (i = 0; i < size; i++) {
 
                     current_palette[i] = [
                         old_palette[i][0] * old_frac + new_palette[i][0] * new_frac,
@@ -210,30 +216,7 @@
 
                 one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
 
-                fetch(
-                    "/Mandelbrot",
-                    {
-                        method: "POST",
-                        body: JSON.stringify({
-                            canvas_width: full_w,
-                            canvas_height: full_h,
-                            scale: scale,
-                            x: offset_x,
-                            y: offset_y
-                        }),
-                        headers: { 'Content-Type': 'application/json' }
-                    }
-                )
-                    .then(data => { return data.json() })
-                    .then(json_data => {
-                        StopColourLoop();
-                        escape_array = json_data;
-                        DrawCanvas();
-                        StartColourLoop();
-                    })
-                    .catch(function () {
-                        console.log("Failed to get all defect data");
-                    });
+                AskServer();
             }
 
             //-------------------------------------------------------------------------------------
@@ -255,30 +238,7 @@
                 offset_y = 0;
                 scale = 0.125;
 
-                fetch(
-                    "/Mandelbrot",
-                    {
-                        method: "POST",
-                        body: JSON.stringify({
-                            canvas_width: full_w,
-                            canvas_height: full_h,
-                            scale: scale,
-                            x: offset_x,
-                            y: offset_y
-                        }),
-                        headers: { 'Content-Type': 'application/json' }
-                    }
-                )
-                    .then(data => { return data.json() })
-                    .then(json_data => {
-                        StopColourLoop();
-                        escape_array = json_data;
-                        DrawCanvas();
-                        StartColourLoop();
-                    })
-                    .catch(function () {
-                        console.log("Failed to get all defect data");
-                    });
+                AskServer();
             }
 
             function click_handler(event) {
@@ -287,6 +247,16 @@
                 offset_x = complex[0];
                 offset_y = complex[1];
 
+                AskServer();
+            }
+
+            function AskServer() {
+
+                if (request_in_progress) {
+                    return;
+                }
+                request_in_progress = true;
+
                 fetch(
                     "/Mandelbrot",
                     {
@@ -307,9 +277,11 @@
                         escape_array = json_data;
                         DrawCanvas();
                         StartColourLoop();
+                        request_in_progress = false;
                     })
                     .catch(function () {
-                        console.log("Failed to get all defect data");
+                        console.log("Failed to get data");
+                        request_in_progress = false;
                     });
             }
 
@@ -382,30 +354,7 @@
                 new_palette = CreatePalette();
                 palette_counter = 0;
 
-
-                fetch(
-                    "/Mandelbrot",
-                    {
-                        method: "POST",
-                        body: JSON.stringify({
-                            canvas_width: full_w,
-                            canvas_height: full_h,
-                            scale: scale,
-                            x: offset_x,
-                            y: offset_y
-                        }),
-                        headers: { 'Content-Type': 'application/json' }
-                    }
-                )
-                    .then(data => { return data.json() })
-                    .then(json_data => {
-                        escape_array = json_data;
-                        DrawCanvas();
-                        StartColourLoop();
-                    })
-                    .catch(function () {
-                        console.log("Failed to get all defect data");
-                    });
+                AskServer();
             }
 
             //-------------------------------------------------------------------------------------
