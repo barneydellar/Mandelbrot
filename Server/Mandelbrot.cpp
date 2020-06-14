@@ -16,28 +16,42 @@ Mandelbrot::Mandelbrot(const int canvas_width, const int canvas_height, const do
 
 int Mandelbrot::ComplexToMandelbrot(const complex& c) const {
 
-    complex z = 0;
-    double new_square_r = 0;
-    double new_square_i = 0;
-    complex derivative = 1;
+    double x0 = c.real();
+    double y0 = c.imag();
+
+    double x2 = 0.0;
+    double y2 = 0.0;
+    double w = 0.0;
+
+    double derivx = 1;
+    double derivy = 0;
+
     for (auto i = 1; i < limit; i++) {
-        complex new_ = { c.real() + new_square_r - new_square_i, c.imag() + (2 * z.real() * z.imag()) };
 
-        new_square_r = std::pow(new_.real(), 2);
-        new_square_i = std::pow(new_.imag(), 2);
+        const auto x = x2 - y2 + x0;
+        const auto y = w - x2 - y2 + y0;
 
-        const auto mag = new_square_r + new_square_i;
+        if (std::pow(derivx, 2) + std::pow(derivy, 2) < 1e-9) {
+            return 0;
+        }
+
+        const double new_derivx = 2 * (derivx * x - derivy * y);
+        derivy = 2 * (derivx * y + derivy * x);
+        derivx = new_derivx;
+
+        x2 = std::pow(x, 2);
+        y2 = std::pow(y, 2);
+
+        w = std::pow((x + y), 2);
+
+        const auto mag = x2 + y2;
 
         if (mag < 1e-12) {
             return 0;
         }
-
         if (mag > 4) {
             return i;
         }
-        derivative = derivative * z;
-        derivative += derivative;
-        z = new_;
     }
     return 0;
 }
