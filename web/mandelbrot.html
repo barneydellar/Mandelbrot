@@ -196,6 +196,9 @@
 
             function zoom_handler(event) {
 
+                if (request_in_progress) {
+                    return;
+                }
 
                 var delta = 0;
 
@@ -232,6 +235,9 @@
 
             function right_click_handler(event) {
 
+                if (request_in_progress) {
+                    return;
+                }
                 event.preventDefault();
 
                 offset_x = 0;
@@ -243,7 +249,11 @@
 
             function click_handler(event) {
 
-                var complex = ViewToComplex(event.pageX, event.pageY);
+                if (request_in_progress) {
+                    return;
+                }
+
+                var complex = ViewToComplex(event.offsetX, event.offsetY);
                 offset_x = complex[0];
                 offset_y = complex[1];
 
