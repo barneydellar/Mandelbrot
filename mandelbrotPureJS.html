@@ -139,8 +139,10 @@
 
         function GetCurrentPalette() {
 
-            var old_frac = 1 - (palette_counter / 100);
-            var new_frac = palette_counter / 100;
+            var iterations = 100;
+
+            var old_frac = 1 - (palette_counter / iterations);
+            var new_frac = palette_counter / iterations;
 
             var size = old_palette.length;
             var current_palette = new Array(size);
@@ -156,7 +158,7 @@
 
             palette_counter++;
 
-            if (palette_counter >= 100) {
+            if (palette_counter >= iterations) {
                 palette_counter = 0;
                 old_palette = new_palette;
                 new_palette = CreatePalette();
@@ -278,7 +280,7 @@
             // Start the tick function to change the colours
             StopColourLoop();
 
-            interval_token = setInterval(function () { DrawCanvas(); }, 50);
+            interval_token = setInterval(function () { DrawCanvas(); }, 1);
         }
 
         //-------------------------------------------------------------------------------------
