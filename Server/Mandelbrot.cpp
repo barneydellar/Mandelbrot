@@ -17,23 +17,26 @@ Mandelbrot::Mandelbrot(const int canvas_width, const int canvas_height, const do
 int Mandelbrot::ComplexToMandelbrot(const complex c) const {
 
     complex z = 0;
-    complex new_square = 0;
+    double new_square_r = 0;
+    double new_square_i = 0;
     complex derivative = 1;
-    const auto two = complex{ 2, 0 };
     for (auto i = 1; i < limit; i++) {
-        complex new_ = { c.real() + new_square.real() - new_square.imag(), c.imag() + (2 * z.real() * z.imag()) };
-        new_square = { pow(new_.real(), 2), pow(new_.imag(), 2) };
+        complex new_ = { c.real() + new_square_r - new_square_i, c.imag() + (2 * z.real() * z.imag()) };
 
-        const auto mag = new_square.real() + new_square.imag();
+        new_square_r = std::pow(new_.real(), 2);
+        new_square_i = std::pow(new_.imag(), 2);
 
-        if (mag < 1e-12) {
+        const auto mag = new_square_r + new_square_i;
+
+        if (mag < 1e-9) {
             return 0;
         }
 
-        if (mag > 400) {
+        if (mag > 4) {
             return i;
         }
-        derivative = derivative * two * z;
+        derivative = derivative * z;
+        derivative += derivative;
         z = new_;
     }
     return 0;
@@ -82,12 +85,12 @@ web::json::value Mandelbrot::JSON() const {
 
     auto escape_array = web::json::value::array(canvas_width * canvas_height);
     int i = 0;
-    for (const auto l : canvas) {
+    for (const auto& l : canvas) {
         for (const auto v : l) {
             escape_array[i++] = v;
         }
     }
 
-    return escape_array;
+    return std::move(escape_array);
 }
 
