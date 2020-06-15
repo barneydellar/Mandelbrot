@@ -16,41 +16,39 @@ Mandelbrot::Mandelbrot(const int canvas_width, const int canvas_height, const do
 
 int Mandelbrot::ComplexToMandelbrot(const complex& c) const {
 
-    double x0 = c.real();
-    double y0 = c.imag();
+    double cr = c.real();
+    double ci = c.imag();
 
-    double x2 = 0.0;
-    double y2 = 0.0;
+    double zr = 0.0;
+    double zi = 0.0;
     double w = 0.0;
 
-    double derivx = 1;
-    double derivy = 0;
+    double derivr = 1;
+    double derivi = 0;
 
-    for (auto i = 1; i < limit; i++) {
+    for (auto l = 1; l < limit; l++) {
 
-        const auto x = x2 - y2 + x0;
-        const auto y = w - x2 - y2 + y0;
+        const auto r = zr - zi + cr;
+        const auto i = w - zr - zi + ci;
 
-        if (std::pow(derivx, 2) + std::pow(derivy, 2) < 1e-9) {
+        if (derivr*derivr + derivi* derivi < 1e-9) {
             return 0;
         }
 
-        const double new_derivx = 2 * (derivx * x - derivy * y);
-        derivy = 2 * (derivx * y + derivy * x);
-        derivx = new_derivx;
+        const double new_derivr = 2 * (derivr * r - derivi * i);
+        derivi = 2 * (derivr * i + derivi * r);
+        derivr = new_derivr;
 
-        x2 = std::pow(x, 2);
-        y2 = std::pow(y, 2);
+        zr = r * r;
+        zi = i * i;
 
-        w = std::pow((x + y), 2);
+        const auto rplusi = (r + i);
+        w = rplusi * rplusi;
 
-        const auto mag = x2 + y2;
+        const auto mag = zr + zi;
 
-        if (mag < 1e-12) {
-            return 0;
-        }
         if (mag > 4) {
-            return i;
+            return l;
         }
     }
     return 0;
