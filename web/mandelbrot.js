@@ -34,32 +34,32 @@ function BrightColourValue() {
 //-------------------------------------------------------------------------------------
 
 function DimColourValue() {
-    return getRndBias(0, 255, 50, 1);
+    return getRndBias(0, 255, 0, 1);
 }
 
 //-------------------------------------------------------------------------------------
 
 function RandomColour() {
 
-    // Choose a colour (red, green, blue, cyan, magenta, yellow, light, dark);
-    var bright_index = Math.floor(Math.random() * 8);
+    // Choose a colour (red, green, blue, cyan, magenta, yellow, dark);
+    var bright_index = Math.floor(Math.random() * 7);
 
     var r_func;
-    if (bright_index === 0 || bright_index === 3 || bright_index === 4 || bright_index === 6) {
+    if (bright_index === 0 || bright_index === 3 || bright_index === 4) {
         r_func = BrightColourValue;
     } else {
         r_func = DimColourValue;
     }
 
     var g_func;
-    if (bright_index === 1 || bright_index === 3 || bright_index === 5 || bright_index === 6) {
+    if (bright_index === 1 || bright_index === 3 || bright_index === 5) {
         g_func = BrightColourValue;
     } else {
         g_func = DimColourValue;
     }
 
     var b_func;
-    if (bright_index === 2 || bright_index === 4 || bright_index === 5 || bright_index === 6) {
+    if (bright_index === 2 || bright_index === 4 || bright_index === 5) {
         b_func = BrightColourValue;
     } else {
         b_func = DimColourValue;
@@ -232,7 +232,9 @@ function right_click_handler(event) {
 
     offset_x = 0;
     offset_y = 0;
-    scale = 0.125;
+    scale = 1;
+
+    one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
 
     NewMandelbrot();
 }
@@ -249,8 +251,6 @@ function click_handler(event) {
 
     NewMandelbrot();
 }
-
-
 
 //-------------------------------------------------------------------------------------
 
@@ -269,7 +269,7 @@ function StartColourLoop() {
     // Start the tick function to change the colours
     StopColourLoop();
 
-    interval_token = setInterval(function () { DrawCanvas(); }, 1);
+    interval_token = setInterval(function () { DrawCanvas(); }, 20);
 }
 
 //-------------------------------------------------------------------------------------

@@ -55,5 +55,8 @@
     <None Include="..\web\mandelbrot.js">
       <Filter>web</Filter>
     </None>
+    <None Include="..\web\mandelbrotPureJS.html">
+      <Filter>web</Filter>
+    </None>
   </ItemGroup>
 </Project>
