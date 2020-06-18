@@ -1,4 +1,5 @@
 #pragma once
+#include "Mandelbrot.h"
 
 class WebServer final
 {
@@ -14,6 +15,8 @@ public:
     pplx::task<void> Close();
 
 private:
+
+    Mandelbrot mandelbrot;
 
     void ReplyForMissingJson(web::http::http_request, std::string);
     int GetInt(web::http::http_request, web::json::value, std::wstring);

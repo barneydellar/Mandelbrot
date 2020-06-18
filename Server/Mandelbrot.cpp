@@ -1,16 +1,27 @@
 #include "stdafx.h"
 #include "Mandelbrot.h"
 
-Mandelbrot::Mandelbrot(const int canvas_width, const int canvas_height, const double scale, const double x, const double y) :
-    canvas_width(canvas_width),
-    canvas_height(canvas_height),
-    scale(scale),
-    offset_x(x),
-    offset_y(y),
-    half_w(canvas_width * 0.5),
-    half_h(canvas_height * 0.5),
-    one_over_min_half(1 / (scale * std::min(half_w, half_h)))
-{
+
+void Mandelbrot::Resize(const int w, const int h) {
+
+    if (canvas_width == w && canvas_height == h) {
+        return;
+    }
+
+    canvas_width = w;
+    canvas_height = h;
+    half_w = canvas_width * 0.5;
+    half_h = canvas_height * 0.5;
+
+    canvas.resize(canvas_height);
+    for (auto& line : canvas) {
+        line.resize(canvas_width);
+    }
+
+    lines.resize(canvas_height);
+    std::iota(lines.begin(), lines.end(), 0);
+
+    escape_array = web::json::value::array(canvas_width * canvas_height);
 }
 
 
@@ -60,7 +71,12 @@ Mandelbrot::complex Mandelbrot::ViewToComplex(const int x, const int y) const {
     return { x_complex, y_complex };
 }
 
-web::json::value Mandelbrot::JSON() const {
+const web::json::value& Mandelbrot::JSON(const double s, const double x, const double y) {
+
+    scale = s;
+    offset_x = x;
+    offset_y = y;
+    one_over_min_half = 1 / (scale * std::min(half_w, half_h));
 
     const auto origin_complex = ViewToComplex(0, 0);
     const auto x_complex = ViewToComplex(1, 0);
@@ -69,20 +85,11 @@ web::json::value Mandelbrot::JSON() const {
     const auto step_x = x_complex - origin_complex;
     const auto step_y = y_complex - origin_complex;
 
-    std::vector<std::vector<int>> canvas;
-    canvas.resize(canvas_height);
-    for (auto& line : canvas) {
-        line.resize(canvas_width);
-    }
-
-    std::vector<int> lines(canvas_height);
-    std::iota(lines.begin(), lines.end(), 0);
-
     std::for_each(
-        std::execution::par,
+        std::execution::par_unseq,
         lines.cbegin(),
         lines.cend(),
-        [step_x, origin_complex, step_y, this, &canvas](const int l)
+        [step_x, origin_complex, step_y, this](const int l)
     {
         const auto complex_y_iter = origin_complex + (step_y * complex(l, 0));
 
@@ -95,7 +102,6 @@ web::json::value Mandelbrot::JSON() const {
     }
     );
 
-    auto escape_array = web::json::value::array(canvas_width * canvas_height);
     int i = 0;
     for (const auto& l : canvas) {
         for (const auto v : l) {
@@ -103,6 +109,6 @@ web::json::value Mandelbrot::JSON() const {
         }
     }
 
-    return std::move(escape_array);
+    return escape_array;
 }
 

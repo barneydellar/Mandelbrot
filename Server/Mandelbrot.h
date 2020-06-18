@@ -5,27 +5,30 @@ class Mandelbrot
 {
 public:
 
-    Mandelbrot(int, int, double, double, double);
+    void Resize(int, int);
 
-    [[nodiscard]] web::json::value JSON() const;
+    [[nodiscard]] const web::json::value& JSON(double, double, double);
 
-    const int canvas_width;
-    const int canvas_height;
-    const double scale;
-    const double offset_x;
-    const double offset_y;
+    int canvas_width;
+    int canvas_height;
+    double scale;
+    double offset_x;
+    double offset_y;
 
-    const double half_w;
-    const double half_h;
-    const double one_over_min_half{};
+    double half_w;
+    double half_h;
+    double one_over_min_half{};
     const int limit = 10000;
 
 private:
+
+    std::vector<std::vector<int>> canvas;
+    std::vector<int> lines;
+    web::json::value escape_array;
 
     using complex = std::complex<double>;
 
     [[nodiscard]] int ComplexToMandelbrot(const complex& c) const;
     [[nodiscard]] complex ViewToComplex(int x, int y) const;
-
 };
 

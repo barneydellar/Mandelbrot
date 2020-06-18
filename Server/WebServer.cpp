@@ -139,10 +139,18 @@ void WebServer::HandlePost(http_request request)
                 const auto y = GetDouble(request, request_json, L"y");
 
                 if (request.absolute_uri().path() == L"/Mandelbrot") {
-                    m_logger->info("(" + std::to_string(x) + ", " + std::to_string(y) + ") : " + std::to_string(scale));
-                    const Mandelbrot m(canvas_width, canvas_height, scale, x, y);
-                    const auto js = m.JSON();
-                    m_logger->info("Done");
+                    const auto start_time = std::chrono::system_clock::now();
+                    mandelbrot.Resize(canvas_width, canvas_height);
+                    const auto js = mandelbrot.JSON(scale, x, y);
+
+                    const auto end_time = std::chrono::system_clock::now();
+
+                    m_logger->info("({0}, {1}) {2}. {3}s",
+                        std::to_string(x),
+                        std::to_string(y),
+                        std::to_string(scale),
+                        std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() / 1000.0
+                    );
                     request.reply(status_codes::OK, js);
                     return;
                 }
