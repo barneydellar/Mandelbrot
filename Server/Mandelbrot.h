@@ -1,5 +1,4 @@
 #pragma once
-#include <complex>
 
 class Mandelbrot
 {
@@ -7,24 +6,24 @@ public:
 
     void Resize(int, int);
 
-    [[nodiscard]] const web::json::value& JSON(double, double, double);
+    [[nodiscard]] const web::json::value& Json(double, double, double);
 
-    int canvas_width;
-    int canvas_height;
-    double scale;
-    double offset_x;
-    double offset_y;
+    int m_canvas_width{};
+    int m_canvas_height{};
+    double m_scale{};
+    double m_offset_x{};
+    double m_offset_y{};
 
-    double half_w;
-    double half_h;
-    double one_over_min_half{};
-    const int limit = 10000;
+    double m_half_w{};
+    double m_half_h{};
+    double m_one_over_min_half{};
+    const int m_limit = 10000;
 
 private:
 
-    std::vector<std::vector<int>> canvas;
-    std::vector<int> lines;
-    web::json::value escape_array;
+    std::vector<std::vector<int>> m_canvas{};
+    std::vector<int> m_lines{};
+    web::json::value m_escape_array{};
 
     using complex = std::complex<double>;
 

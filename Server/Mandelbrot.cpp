@@ -4,57 +4,57 @@
 
 void Mandelbrot::Resize(const int w, const int h) {
 
-    if (canvas_width == w && canvas_height == h) {
+    if (m_canvas_width == w && m_canvas_height == h) {
         return;
     }
 
-    canvas_width = w;
-    canvas_height = h;
-    half_w = canvas_width * 0.5;
-    half_h = canvas_height * 0.5;
+    m_canvas_width = w;
+    m_canvas_height = h;
+    m_half_w = m_canvas_width * 0.5;
+    m_half_h = m_canvas_height * 0.5;
 
-    canvas.resize(canvas_height);
-    for (auto& line : canvas) {
-        line.resize(canvas_width);
+    m_canvas.resize(m_canvas_height);
+    for (auto& line : m_canvas) {
+        line.resize(m_canvas_width);
     }
 
-    lines.resize(canvas_height);
-    std::iota(lines.begin(), lines.end(), 0);
+    m_lines.resize(m_canvas_height);
+    std::iota(m_lines.begin(), m_lines.end(), 0);
 
-    escape_array = web::json::value::array(canvas_width * canvas_height);
+    m_escape_array = web::json::value::array(m_canvas_width * m_canvas_height);
 }
 
 
 int Mandelbrot::ComplexToMandelbrot(const complex& c) const {
 
-    double cr = c.real();
-    double ci = c.imag();
+    const auto cr = c.real();
+    const auto ci = c.imag();
 
-    double zr = 0.0;
-    double zi = 0.0;
-    double w = 0.0;
+    auto zr = 0.0;
+    auto zi = 0.0;
+    auto w = 0.0;
 
-    double derivr = 1;
-    double derivi = 0;
+    double derived_r = 1;
+    double derived_i = 0;
 
-    for (auto l = 1; l < limit; l++) {
+    for (auto l = 1; l < m_limit; l++) {
 
         const auto r = zr - zi + cr;
         const auto i = w - zr - zi + ci;
 
-        if (derivr*derivr + derivi* derivi < 1e-9) {
+        if (derived_r*derived_r + derived_i* derived_i < 1e-9) {
             return 0;
         }
 
-        const double new_derivr = 2 * (derivr * r - derivi * i);
-        derivi = 2 * (derivr * i + derivi * r);
-        derivr = new_derivr;
+        const auto new_derived_r = 2 * (derived_r * r - derived_i * i);
+        derived_i = 2 * (derived_r * i + derived_i * r);
+        derived_r = new_derived_r;
 
         zr = r * r;
         zi = i * i;
 
-        const auto rplusi = (r + i);
-        w = rplusi * rplusi;
+        const auto r_plus_i = r + i;
+        w = r_plus_i * r_plus_i;
 
         const auto mag = zr + zi;
 
@@ -66,17 +66,17 @@ int Mandelbrot::ComplexToMandelbrot(const complex& c) const {
 }
 
 Mandelbrot::complex Mandelbrot::ViewToComplex(const int x, const int y) const {
-    const double x_complex = offset_x + ((x - half_w) * one_over_min_half);
-    const double y_complex = offset_y + ((y - half_h) * one_over_min_half);
+    const auto x_complex = m_offset_x + (x - m_half_w) * m_one_over_min_half;
+    const auto y_complex = m_offset_y + (y - m_half_h) * m_one_over_min_half;
     return { x_complex, y_complex };
 }
 
-const web::json::value& Mandelbrot::JSON(const double s, const double x, const double y) {
+const web::json::value& Mandelbrot::Json(const double s, const double x, const double y) {
 
-    scale = s;
-    offset_x = x;
-    offset_y = y;
-    one_over_min_half = 1 / (scale * std::min(half_w, half_h));
+    m_scale = s;
+    m_offset_x = x;
+    m_offset_y = y;
+    m_one_over_min_half = 1 / (m_scale * std::min(m_half_w, m_half_h));
 
     const auto origin_complex = ViewToComplex(0, 0);
     const auto x_complex = ViewToComplex(1, 0);
@@ -87,28 +87,28 @@ const web::json::value& Mandelbrot::JSON(const double s, const double x, const d
 
     std::for_each(
         std::execution::par_unseq,
-        lines.cbegin(),
-        lines.cend(),
+        m_lines.cbegin(),
+        m_lines.cend(),
         [step_x, origin_complex, step_y, this](const int l)
     {
-        const auto complex_y_iter = origin_complex + (step_y * complex(l, 0));
+        const auto complex_y_iter = origin_complex + step_y * complex(l, 0);
 
         auto complex_x_iter = complex_y_iter;
 
-        for (int i = 0; i < canvas_width; ++i) {
-            canvas[l][i] = ComplexToMandelbrot(complex_x_iter);
+        for (auto i = 0; i < m_canvas_width; ++i) {
+            m_canvas[l][i] = ComplexToMandelbrot(complex_x_iter);
             complex_x_iter += step_x;
         }
     }
     );
 
-    int i = 0;
-    for (const auto& l : canvas) {
+    auto i = 0;
+    for (const auto& l : m_canvas) {
         for (const auto v : l) {
-            escape_array[i++] = v;
+            m_escape_array[i++] = v;
         }
     }
 
-    return escape_array;
+    return m_escape_array;
 }
 

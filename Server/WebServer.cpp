@@ -13,12 +13,12 @@ namespace {
         std::setlocale(LC_ALL, "");
         const std::locale locale("");
         typedef std::codecvt<wchar_t, char, std::mbstate_t> converter_type;
-        const converter_type& converter = std::use_facet<converter_type>(locale);
+        const auto& converter = std::use_facet<converter_type>(locale);
         std::vector<char> to(wide_string.length() * converter.max_length());
         std::mbstate_t state;
         const wchar_t* from_next;
         char* to_next;
-        const converter_type::result result = converter.out(state, wide_string.data(), wide_string.data() + wide_string.length(), from_next, &to[0], &to[0] + to.size(), to_next);
+        const auto result = converter.out(state, wide_string.data(), wide_string.data() + wide_string.length(), from_next, &to[0], &to[0] + to.size(), to_next);
         if (result == converter_type::ok || result == converter_type::noconv) {
             const std::string s(&to[0], to_next);
             return s;
@@ -63,7 +63,7 @@ pplx::task<void> WebServer::Close()
     return m_listener.close().then([this](pplx::task<void> t) { HandleError(t); });
 }
 
-void WebServer::HandleGet(http_request request)
+void WebServer::HandleGet(const http_request request)
 {
     if (request.absolute_uri().path() == L"/") {
         return ReturnFile(request, U("Mandelbrot.html"), U("text/html"));
@@ -98,7 +98,7 @@ void WebServer::ReplyForMissingJson(const http_request request, const std::strin
         .then([this](pplx::task<void> t) {HandleError(t);});
 }
 
-int WebServer::GetInt(const http_request request, json::value request_json, utility::string_t s) {
+int WebServer::GetInt(const http_request request, json::value request_json, const utility::string_t s) {
     const auto int_exists = request_json[s].is_integer();
     if (!int_exists) {
         ReplyForMissingJson(request, WStringToString(s) + " not supplied");
@@ -107,7 +107,7 @@ int WebServer::GetInt(const http_request request, json::value request_json, util
     return request_json[s].as_integer();
 }
 
-double WebServer::GetDouble(const http_request request, json::value request_json, utility::string_t s) {
+double WebServer::GetDouble(const http_request request, json::value request_json, const utility::string_t s) {
     const auto double_exists = request_json[s].is_double();
     if (!double_exists) {
         const auto int_exists = request_json[s].is_integer();
@@ -124,7 +124,7 @@ void WebServer::HandlePost(http_request request)
 {
     try {
         request.extract_json()
-        .then([this, request](json::value request_json) {
+        .then([this, request](const json::value request_json) {
             try
             {
                 if (request_json.is_null()) {
@@ -140,8 +140,8 @@ void WebServer::HandlePost(http_request request)
 
                 if (request.absolute_uri().path() == L"/Mandelbrot") {
                     const auto start_time = std::chrono::system_clock::now();
-                    mandelbrot.Resize(canvas_width, canvas_height);
-                    const auto js = mandelbrot.JSON(scale, x, y);
+                    m_mandelbrot.Resize(canvas_width, canvas_height);
+                    const auto js = m_mandelbrot.Json(scale, x, y);
 
                     const auto end_time = std::chrono::system_clock::now();
 
@@ -184,7 +184,7 @@ void WebServer::ReturnFile(
     fstream::open_istream(file, std::ios::in).then([=](const istream is)
     {
         request.reply(status_codes::OK, is, content_type).then([this](pplx::task<void> t) { HandleError(t); });
-    }).then([=](pplx::task<void> t)
+    }).then([=](const pplx::task<void> t)
     {
         try
         {

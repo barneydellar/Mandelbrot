@@ -1,7 +1,6 @@
-
-var offset_x = -0.1089;
-var offset_y = -0.89598;
-var scale = 128;
+var offset_x = -1.786434;
+var offset_y = 0;
+var scale = 66191;
 
 var half_h;
 var half_w;
@@ -15,7 +14,7 @@ var request_in_progress = false;
 var old_palette;
 var new_palette;
 var palette_counter = 0;
-var palette_size = 10000;
+var palette_size = 5000;
 
 var escape_array;
 
@@ -81,12 +80,12 @@ function getRndBias(min, max, bias, influence) {
 function CreatePalette() {
     // Set up the palette:
     var palette = new Array(palette_size);
-    palette[0] = [0, 0, 0]
+    palette[0] = [0, 0, 0];
 
     start_colour = RandomColour();
     end_colour = RandomColour();
 
-    loop_size = getRndBias(1, 100, 3, 1);
+    loop_size = getRndBias(1, 200, 3, 1);
 
     for (i = 1; i < palette_size; i += loop_size) {
 
@@ -119,7 +118,7 @@ function GetColour(palette, palette_length, mandelbrot) {
         return palette[mandelbrot];
     }
 
-    return RandomColour();
+    return palette[palette_length - 1];
 }
 
 //-------------------------------------------------------------------------------------

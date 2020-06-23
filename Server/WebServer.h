@@ -5,7 +5,6 @@ class WebServer final
 {
 public:
     explicit WebServer(int port);
-    ~WebServer() = default;
 
     void HandleGet(web::http::http_request request);
     void HandlePost(web::http::http_request request);
@@ -16,7 +15,7 @@ public:
 
 private:
 
-    Mandelbrot mandelbrot;
+    Mandelbrot m_mandelbrot;
 
     void ReplyForMissingJson(web::http::http_request, std::string);
     int GetInt(web::http::http_request, web::json::value, std::wstring);
