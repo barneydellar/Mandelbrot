@@ -10,8 +10,8 @@ void Mandelbrot::Resize(const int w, const int h) {
 
     m_canvas_width = w;
     m_canvas_height = h;
-    m_half_w = m_canvas_width * 0.5;
-    m_half_h = m_canvas_height * 0.5;
+    m_half_w = m_canvas_width * 0.5L;
+    m_half_h = m_canvas_height * 0.5L;
 
     m_canvas.resize(m_canvas_height);
     for (auto& line : m_canvas) {
@@ -30,19 +30,19 @@ int Mandelbrot::ComplexToMandelbrot(const complex& c) const {
     const auto cr = c.real();
     const auto ci = c.imag();
 
-    auto zr = 0.0;
-    auto zi = 0.0;
-    auto w = 0.0;
+    auto zr = 0.L;
+    auto zi = 0.L;
+    auto w = 0.L;
 
-    double derived_r = 1;
-    double derived_i = 0;
+    auto derived_r = 1.L;
+    auto derived_i = 0.L;
 
     for (auto l = 1; l < m_limit; l++) {
 
         const auto r = zr - zi + cr;
         const auto i = w - zr - zi + ci;
 
-        if (derived_r*derived_r + derived_i* derived_i < 1e-9) {
+        if (std::pow(derived_r, 2) + std::pow(derived_i, 2) < 1e-12L) {
             return 0;
         }
 
@@ -50,11 +50,11 @@ int Mandelbrot::ComplexToMandelbrot(const complex& c) const {
         derived_i = 2 * (derived_r * i + derived_i * r);
         derived_r = new_derived_r;
 
-        zr = r * r;
-        zi = i * i;
+        zr = std::pow(r, 2);
+        zi = std::pow(i, 2);
 
         const auto r_plus_i = r + i;
-        w = r_plus_i * r_plus_i;
+        w = std::pow(r_plus_i, 2);
 
         const auto mag = zr + zi;
 
@@ -71,7 +71,7 @@ Mandelbrot::complex Mandelbrot::ViewToComplex(const int x, const int y) const {
     return { x_complex, y_complex };
 }
 
-const web::json::value& Mandelbrot::Json(const double s, const double x, const double y) {
+const web::json::value& Mandelbrot::Json(const long double s, const long double x, const long double y) {
 
     m_scale = s;
     m_offset_x = x;

@@ -19,7 +19,7 @@ private:
 
     void ReplyForMissingJson(web::http::http_request, std::string);
     int GetInt(web::http::http_request, web::json::value, std::wstring);
-    double GetDouble(web::http::http_request, web::json::value, std::wstring);
+    long double GetDouble(web::http::http_request, web::json::value, std::wstring);
 
     void ReturnFile(
         web::http::http_request const& request,
