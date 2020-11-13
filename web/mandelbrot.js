@@ -1,6 +1,6 @@
-var offset_x = -1.786434;
-var offset_y = 0;
-var scale = 66191;
+var offset_x = -1.749195;
+var offset_y = 0.00000001;
+var scale = 132382.72;
 
 var half_h;
 var half_w;
@@ -11,10 +11,13 @@ var context;
 
 var request_in_progress = false;
 
-var old_palette;
-var new_palette;
+var main_palette;
+var main_palette_size = 20000;
+
 var palette_counter = 0;
-var palette_size = 5000;
+var small_palette;
+var small_palette_size = 500;
+
 
 var escape_array;
 
@@ -27,38 +30,42 @@ function MandelbrotToColour(mand) {
 //-------------------------------------------------------------------------------------
 
 function BrightColourValue() {
-    return getRndBias(0, 255, 255, 1);
+    return getRndBias(150, 255, 255, 1);
 }
 
 //-------------------------------------------------------------------------------------
 
 function DimColourValue() {
-    return getRndBias(0, 255, 0, 1);
+    return getRndBias(0, 100, 0, 0);
 }
 
 //-------------------------------------------------------------------------------------
 
+function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
+}
+
 function RandomColour() {
 
-    // Choose a colour (red, green, blue, cyan, magenta, yellow, dark);
-    var bright_index = Math.floor(Math.random() * 7);
+    var colorIndex= Math.floor(Math.random() * 7);
+    const Colours = {red:0, green:1, blue:2, cyan:3, magenta:4, yellow:5, dark:6};
 
     var r_func;
-    if (bright_index === 0 || bright_index === 3 || bright_index === 4) {
+    if (colorIndex === Colours.red || colorIndex === Colours.cyan || colorIndex === Colours.magenta) {
         r_func = BrightColourValue;
     } else {
         r_func = DimColourValue;
     }
 
     var g_func;
-    if (bright_index === 1 || bright_index === 3 || bright_index === 5) {
+    if (colorIndex === Colours.green || colorIndex === Colours.cyan || colorIndex === Colours.yellow) {
         g_func = BrightColourValue;
     } else {
         g_func = DimColourValue;
     }
 
     var b_func;
-    if (bright_index === 2 || bright_index === 4 || bright_index === 5) {
+    if (colorIndex === Colours.blue || colorIndex === Colours.magenta || colorIndex === Colours.yellow) {
         b_func = BrightColourValue;
     } else {
         b_func = DimColourValue;
@@ -77,21 +84,21 @@ function getRndBias(min, max, bias, influence) {
 
 //-------------------------------------------------------------------------------------
 
-function CreatePalette() {
-    // Set up the palette:
-    var palette = new Array(palette_size);
+function CreatePalette(size) {
+
+    var palette = new Array(size);
     palette[0] = [0, 0, 0];
 
     start_colour = RandomColour();
     end_colour = RandomColour();
 
-    loop_size = getRndBias(1, 200, 3, 1);
+    loop_size = getRndBias(5, 150, 4, 1);
 
-    for (i = 1; i < palette_size; i += loop_size) {
+    for (i = 1; i < size; i += loop_size) {
 
         for (j = 0; j < loop_size; j++) {
 
-            if (i + j >= palette_size) {
+            if (i + j >= size) {
                 break;
             }
 
@@ -123,34 +130,25 @@ function GetColour(palette, palette_length, mandelbrot) {
 
 //-------------------------------------------------------------------------------------
 
-function GetCurrentPalette() {
+function UpdateMainPalette() {
 
-    var iterations = 100;
+    main_palette[0] = [0, 0, 0];
 
-    var old_frac = 1 - (palette_counter / iterations);
-    var new_frac = palette_counter / iterations;
-
-    var size = old_palette.length;
-    var current_palette = new Array(size);
-
-    for (i = 0; i < size; i++) {
-
-        current_palette[i] = [
-            old_palette[i][0] * old_frac + new_palette[i][0] * new_frac,
-            old_palette[i][1] * old_frac + new_palette[i][1] * new_frac,
-            old_palette[i][2] * old_frac + new_palette[i][2] * new_frac
+    for (i = main_palette_size-1; i > 1; i--) {
+        main_palette[i] = [
+            main_palette[i - 1][0],
+            main_palette[i - 1][1],
+            main_palette[i - 1][2]
         ];
     }
 
+    main_palette[1] = small_palette[palette_counter];
     palette_counter++;
 
-    if (palette_counter >= iterations) {
+    if (palette_counter >= small_palette_size) {
         palette_counter = 0;
-        old_palette = new_palette;
-        new_palette = CreatePalette();
+        small_palette = CreatePalette(small_palette_size);
     }
-
-    return current_palette;
 }
 
 //-------------------------------------------------------------------------------------
@@ -158,16 +156,14 @@ function GetCurrentPalette() {
 function DrawCanvas() {
 
     var canvasData = context.getImageData(0, 0, full_w, full_h);
-    var palette = GetCurrentPalette();
+    UpdateMainPalette();
 
     var colour;
     var canvas_index;
 
-    var palette_length = palette.length;
-
     for (i = 0; i < escape_array.length; i++) {
 
-        colour = GetColour(palette, palette_length, escape_array[i]);
+        colour = GetColour(main_palette, main_palette_size, escape_array[i]);
 
         canvas_index = 4 * i;
 
@@ -178,7 +174,6 @@ function DrawCanvas() {
     }
 
     context.putImageData(canvasData, 0, 0);
-
 }
 
 //-------------------------------------------------------------------------------------
@@ -316,8 +311,8 @@ function SetUp() {
     half_h = full_h * 0.5;
     one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
 
-    old_palette = CreatePalette();
-    new_palette = CreatePalette();
+    small_palette = CreatePalette(small_palette_size);
+    main_palette = CreatePalette(main_palette_size);
     palette_counter = 0;
 
     NewMandelbrot();
