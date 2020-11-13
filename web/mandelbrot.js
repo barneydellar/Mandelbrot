@@ -36,7 +36,7 @@ function BrightColourValue() {
 //-------------------------------------------------------------------------------------
 
 function DimColourValue() {
-    return getRndBias(0, 100, 0, 0);
+    return getRndBias(0, 100, 0, 1);
 }
 
 //-------------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ function CreatePalette(size) {
     start_colour = RandomColour();
     end_colour = RandomColour();
 
-    loop_size = getRndBias(5, 150, 4, 1);
+    loop_size = getRndBias(5, 150, 50, 1);
 
     for (i = 1; i < size; i += loop_size) {
 
