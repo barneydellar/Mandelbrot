@@ -295,12 +295,6 @@ function StartColourLoop() {
 
 //-------------------------------------------------------------------------------------
 
-$(window).resize(function () {
-    SetUp();
-});
-
-//-------------------------------------------------------------------------------------
-
 function doKeyDown(e) {
     if (e.keyCode == 87) {
         small_palette = CreatePalette(small_palette_size);
@@ -337,6 +331,16 @@ function doKeyDown(e) {
 
 //-------------------------------------------------------------------------------------
 
+$(window).resize(function () {
+    StopColourLoop();
+    setTimeout(
+        () => {
+            SetUpWithoutChangingThePalette();
+        },
+        500
+    );
+});
+
 $(document).ready(function () {
 
     var canvas = $("#MandelbrotCanvas")[0];
@@ -352,9 +356,10 @@ $(document).ready(function () {
     SetUp();
 });
 
+
 //-------------------------------------------------------------------------------------
 
-function SetUp() {
+function SetUpWithoutChangingThePalette() {
 
     StopColourLoop();
 
@@ -375,12 +380,16 @@ function SetUp() {
     half_h = full_h * 0.5;
     one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
 
+    NewMandelbrot();
+}
+
+function SetUp() {
     small_palette = CreatePalette(small_palette_size);
     main_palette = new Array(main_palette_size);
     CopySmallPaletteIntoLargeOne();
     main_palette[0] = [0, 0, 0];
 
-    palette_counter = 0;
+    SetUpWithoutChangingThePalette();
 
-    NewMandelbrot();
+    palette_counter = 0;
 }
