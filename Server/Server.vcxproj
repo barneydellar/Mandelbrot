@@ -184,6 +184,7 @@
     <ClCompile Include="WebServer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\index.html" />
     <None Include="..\web\mandelbrot.html" />
     <None Include="..\web\mandelbrot.js" />
     <None Include="..\web\mandelbrotPureJS.html" />
