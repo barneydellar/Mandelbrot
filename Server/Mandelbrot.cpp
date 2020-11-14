@@ -10,8 +10,8 @@ void Mandelbrot::Resize(const int w, const int h) {
 
     m_canvas_width = w;
     m_canvas_height = h;
-    m_half_w = m_canvas_width * 0.5L;
-    m_half_h = m_canvas_height * 0.5L;
+    m_half_w = m_canvas_width * 0.5;
+    m_half_h = m_canvas_height * 0.5;
 
     m_canvas.resize(m_canvas_height);
     for (auto& line : m_canvas) {
@@ -22,6 +22,8 @@ void Mandelbrot::Resize(const int w, const int h) {
     std::iota(m_lines.begin(), m_lines.end(), 0);
 
     m_escape_array = web::json::value::array(m_canvas_width * m_canvas_height);
+
+    json_package = web::json::value{};
 }
 
 
@@ -66,17 +68,25 @@ int Mandelbrot::ComplexToMandelbrot(const complex& c) const {
 }
 
 Mandelbrot::complex Mandelbrot::ViewToComplex(const int x, const int y) const {
+
     const auto x_complex = m_offset_x + (x - m_half_w) * m_one_over_min_half;
     const auto y_complex = m_offset_y + (y - m_half_h) * m_one_over_min_half;
     return { x_complex, y_complex };
 }
 
-const web::json::value& Mandelbrot::Json(const long double s, const long double x, const long double y) {
+const web::json::value& Mandelbrot::Json(const double s, const double x, const double y) {
 
     m_scale = s;
     m_offset_x = x;
     m_offset_y = y;
-    m_one_over_min_half = 1 / (m_scale * std::min(m_half_w, m_half_h));
+
+    const auto min_width = std::min(m_half_w, m_half_h);
+
+    m_one_over_min_half = 1 / (m_scale * min_width);
+    m_one_over_min_half = std::max(std::numeric_limits<double>::epsilon()*10, m_one_over_min_half);
+
+    m_scale = 1 / (m_one_over_min_half  * min_width);
+    json_package[L"Scale"] = web::json::value(m_scale);
 
     const auto origin_complex = ViewToComplex(0, 0);
     const auto x_complex = ViewToComplex(1, 0);
@@ -109,6 +119,7 @@ const web::json::value& Mandelbrot::Json(const long double s, const long double 
         }
     }
 
-    return m_escape_array;
+    json_package[L"Array"] = m_escape_array;
+    return json_package;
 }
 

@@ -33,7 +33,8 @@
                 .then(data => { return data.json() })
                 .then(json_data => {
                     StopColourLoop();
-                    escape_array = json_data;
+                    escape_array = json_data["Array"];
+                    scale = json_data["Scale"];
                     DrawCanvas();
                     StartColourLoop();
                     request_in_progress = false;

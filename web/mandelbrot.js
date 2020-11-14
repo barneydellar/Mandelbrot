@@ -16,7 +16,7 @@ var main_palette_size = 20000;
 
 var palette_counter = 0;
 var small_palette;
-var small_palette_size = 500;
+var small_palette_size = 800;
 
 
 var escape_array;
@@ -30,7 +30,7 @@ function MandelbrotToColour(mand) {
 //-------------------------------------------------------------------------------------
 
 function BrightColourValue() {
-    return getRndBias(150, 255, 255, 1);
+    return getRndBias(50, 255, 255, 1);
 }
 
 //-------------------------------------------------------------------------------------
@@ -41,11 +41,7 @@ function DimColourValue() {
 
 //-------------------------------------------------------------------------------------
 
-function getKeyByValue(object, value) {
-    return Object.keys(object).find(key => object[key] === value);
-}
-
-function RandomColour() {
+function RandomColourImp() {
 
     var colorIndex= Math.floor(Math.random() * 7);
     const Colours = {red:0, green:1, blue:2, cyan:3, magenta:4, yellow:5, dark:6};
@@ -76,6 +72,21 @@ function RandomColour() {
 
 //-------------------------------------------------------------------------------------
 
+function RandomColour(other) {
+
+    while (true) {
+        new_color = RandomColourImp();
+        distance = Math.pow(other[0] - new_color[0], 2) + Math.pow(other[1] - new_color[1], 2) + Math.pow(other[2] - new_color[2], 2);
+        if (distance > 1000) {
+            break;
+        }
+    }
+
+    return new_color;
+}
+
+//-------------------------------------------------------------------------------------
+
 function getRndBias(min, max, bias, influence) {
     var rnd = Math.random() * (max - min) + min,
         mix = Math.random() * influence;
@@ -87,14 +98,17 @@ function getRndBias(min, max, bias, influence) {
 function CreatePalette(size) {
 
     var palette = new Array(size);
-    palette[0] = [0, 0, 0];
 
-    start_colour = RandomColour();
-    end_colour = RandomColour();
+    start_colour = RandomColour([0, 0, 0]);
+    end_colour = RandomColour(start_colour);
 
-    loop_size = getRndBias(5, 150, 50, 1);
+    initial_colour = start_colour;
 
-    for (i = 1; i < size; i += loop_size) {
+    divisor = getRndBias(2, 100, 3, 1);
+
+    loop_size = Math.ceil(size / divisor);
+
+    for (i = 0; i < size; i += loop_size) {
 
         for (j = 0; j < loop_size; j++) {
 
@@ -112,7 +126,12 @@ function CreatePalette(size) {
             ];
         }
         start_colour = end_colour;
-        end_colour = RandomColour();
+
+        if (i + j + loop_size >= size) {
+            end_colour = initial_colour;
+        } else {
+            end_colour = RandomColour(end_colour);
+        }
     }
     return palette;
 }
@@ -132,8 +151,6 @@ function GetColour(palette, palette_length, mandelbrot) {
 
 function UpdateMainPalette() {
 
-    main_palette[0] = [0, 0, 0];
-
     for (i = main_palette_size-1; i > 1; i--) {
         main_palette[i] = [
             main_palette[i - 1][0],
@@ -147,7 +164,17 @@ function UpdateMainPalette() {
 
     if (palette_counter >= small_palette_size) {
         palette_counter = 0;
-        small_palette = CreatePalette(small_palette_size);
+    }
+}
+
+function CopySmallPaletteIntoLargeOne() {
+
+    for (i = 1; i < main_palette_size; i++) {
+        main_palette[i] = [
+            small_palette[i % small_palette_size][0],
+            small_palette[i % small_palette_size][1],
+            small_palette[i % small_palette_size][2]
+        ];
     }
 }
 
@@ -274,6 +301,42 @@ $(window).resize(function () {
 
 //-------------------------------------------------------------------------------------
 
+function doKeyDown(e) {
+    if (e.keyCode == 87) {
+        small_palette = CreatePalette(small_palette_size);
+        palette_counter = 0;
+        CopySmallPaletteIntoLargeOne();
+        return;
+    }
+    
+    if (e.keyCode == 49) {
+        offset_x = -1.749195;
+        offset_y = 0.00000001;
+        scale = 132382.72;
+    }
+    if (e.keyCode == 50) {
+        offset_x = 0.434571;
+        offset_y = -0.357455;
+        scale = 4136.96;
+    }
+    else if (e.keyCode == 51) {
+        offset_x = -0.128550;
+        offset_y = -0.985627;
+        scale = 2118123.52;
+    }
+    else if (e.keyCode == 52) {
+        offset_x = -1.251657;
+        offset_y = 0.389325;
+        scale = 2190648069.324800;
+    }
+
+    one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
+    NewMandelbrot();
+
+}
+
+//-------------------------------------------------------------------------------------
+
 $(document).ready(function () {
 
     var canvas = $("#MandelbrotCanvas")[0];
@@ -282,6 +345,7 @@ $(document).ready(function () {
 
     if (window.addEventListener) {
         document.addEventListener('DOMMouseScroll', zoom_handler, false);
+        document.addEventListener("keydown", doKeyDown, true);
     }
     document.onmousewheel = zoom_handler;
 
@@ -312,7 +376,10 @@ function SetUp() {
     one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
 
     small_palette = CreatePalette(small_palette_size);
-    main_palette = CreatePalette(main_palette_size);
+    main_palette = new Array(main_palette_size);
+    CopySmallPaletteIntoLargeOne();
+    main_palette[0] = [0, 0, 0];
+
     palette_counter = 0;
 
     NewMandelbrot();

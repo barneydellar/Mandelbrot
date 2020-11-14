@@ -107,7 +107,7 @@ int WebServer::GetInt(const http_request request, json::value request_json, cons
     return request_json[s].as_integer();
 }
 
-long double WebServer::GetDouble(const http_request request, json::value request_json, const utility::string_t s) {
+double WebServer::GetDouble(const http_request request, json::value request_json, const utility::string_t s) {
     const auto double_exists = request_json[s].is_double();
     if (!double_exists) {
         const auto int_exists = request_json[s].is_integer();
