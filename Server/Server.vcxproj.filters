@@ -55,10 +55,10 @@
     <None Include="..\web\mandelbrot.js">
       <Filter>web</Filter>
     </None>
-    <None Include="..\web\mandelbrotPureJS.html">
+    <None Include="..\index.html">
       <Filter>web</Filter>
     </None>
-    <None Include="..\index.html">
+    <None Include="..\web\mandelbrotMouse.js">
       <Filter>web</Filter>
     </None>
   </ItemGroup>

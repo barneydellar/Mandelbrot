@@ -9,7 +9,6 @@ var full_w;
 var one_over_min_half;
 var context;
 
-var request_in_progress = false;
 
 var main_palette;
 var main_palette_size = 20000;
@@ -22,6 +21,8 @@ var small_palette_size = 800;
 var escape_array;
 
 var interval_token = -1;
+
+//-------------------------------------------------------------------------------------
 
 function MandelbrotToColour(mand) {
     return palette[mand];
@@ -205,36 +206,6 @@ function DrawCanvas() {
 
 //-------------------------------------------------------------------------------------
 
-function zoom_handler(event) {
-
-    if (request_in_progress) {
-        return;
-    }
-
-    var delta = 0;
-
-    if (!event) event = window.event;
-    // normalize the delta
-    if (event.wheelDelta) {
-        // IE and Opera
-        delta = event.wheelDelta / 60;
-    } else if (event.detail) {
-        // W3C
-        delta = -event.detail / 2;
-    }
-    if (delta > 0) {
-        scale *= delta;
-    } else {
-        scale /= -delta;
-    }
-
-    one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
-
-    NewMandelbrot();
-}
-
-//-------------------------------------------------------------------------------------
-
 function ViewToComplex(x, y) {
 
     // Map (0->w) to (-1, 1);
@@ -242,35 +213,6 @@ function ViewToComplex(x, y) {
     var y_complex = offset_y + ((y - half_h) * one_over_min_half);
 
     return ([x_complex, y_complex]);
-}
-
-function right_click_handler(event) {
-
-    event.preventDefault();
-    if (request_in_progress) {
-        return;
-    }
-
-    offset_x = 0;
-    offset_y = 0;
-    scale = 1;
-
-    one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
-
-    NewMandelbrot();
-}
-
-function click_handler(event) {
-
-    if (request_in_progress) {
-        return;
-    }
-
-    var complex = ViewToComplex(event.offsetX, event.offsetY);
-    offset_x = complex[0];
-    offset_y = complex[1];
-
-    NewMandelbrot();
 }
 
 //-------------------------------------------------------------------------------------
@@ -295,69 +237,6 @@ function StartColourLoop() {
 
 //-------------------------------------------------------------------------------------
 
-function doKeyDown(e) {
-    if (e.keyCode == 87) {
-        small_palette = CreatePalette(small_palette_size);
-        palette_counter = 0;
-        CopySmallPaletteIntoLargeOne();
-        return;
-    }
-    
-    if (e.keyCode == 49) {
-        offset_x = -1.749195;
-        offset_y = 0.00000001;
-        scale = 132382.72;
-    }
-    if (e.keyCode == 50) {
-        offset_x = 0.434571;
-        offset_y = -0.357455;
-        scale = 4136.96;
-    }
-    else if (e.keyCode == 51) {
-        offset_x = -0.128550;
-        offset_y = -0.985627;
-        scale = 2118123.52;
-    }
-    else if (e.keyCode == 52) {
-        offset_x = -1.251657;
-        offset_y = 0.389325;
-        scale = 2190648069.324800;
-    }
-
-    one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
-    NewMandelbrot();
-
-}
-
-//-------------------------------------------------------------------------------------
-
-$(window).resize(function () {
-    StopColourLoop();
-    setTimeout(
-        () => {
-            SetUpWithoutChangingThePalette();
-        },
-        500
-    );
-});
-
-$(document).ready(function () {
-
-    var canvas = $("#MandelbrotCanvas")[0];
-    canvas.addEventListener('click', click_handler, false);
-    canvas.addEventListener('contextmenu', right_click_handler, true);
-
-    if (window.addEventListener) {
-        document.addEventListener('DOMMouseScroll', zoom_handler, false);
-        document.addEventListener("keydown", doKeyDown, true);
-    }
-    document.onmousewheel = zoom_handler;
-
-    SetUp();
-});
-
-
-//-------------------------------------------------------------------------------------
 
 function SetUpWithoutChangingThePalette() {
 
