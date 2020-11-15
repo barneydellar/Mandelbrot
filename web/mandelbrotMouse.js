@@ -160,10 +160,9 @@ $(document).ready(function () {
     var canvas = $("#MandelbrotCanvas")[0];
     canvas.addEventListener('click', click_handler, false);
     canvas.addEventListener('contextmenu', right_click_handler, true);
-
-    canvas.ontouchstart = touch_start_handler;
-    canvas.ontouchcancel = touch_end_handler;
-    canvas.ontouchend = touch_end_handler;
+    canvas.addEventListener('touchstart', touch_start_handler, true);
+    canvas.addEventListener('touchcancel', touch_end_handler, true);
+    canvas.addEventListener('touchend', touch_end_handler, true);
 
     if (window.addEventListener) {
         document.addEventListener('DOMMouseScroll', zoom_handler, false);
