@@ -107,26 +107,20 @@ function touch_start_handler(ev) {
 }
 function touch_end_handler(ev) {
 
-    alert("targetTouches " + ev.targetTouches.length);
-    alert("touches " + ev.touches.length);
-    alert("changedTouches " + ev.changedTouches.length);
-    
     ev.preventDefault();
 
-    if (ev.targetTouches.length == 2) {
+    if (ev.changedTouches.length == 2) {
 
         var point1 = -1, point2 = -1;
         for (var i = 0; i < tpCache.length; i++) {
-            if (tpCache[i].identifier == ev.targetTouches[0].identifier) point1 = i;
-            if (tpCache[i].identifier == ev.targetTouches[1].identifier) point2 = i;
+            if (tpCache[i].identifier == ev.changedTouches[0].identifier) point1 = i;
+            if (tpCache[i].identifier == ev.changedTouches[1].identifier) point2 = i;
         }
         if (point1 >= 0 && point2 >= 0) {
             // Calculate the difference between the start and move coordinates
             var initial_gap = Math.abs(tpCache[point2].clientY - tpCache[point1].clientY);
-            var current_gap = Math.abs(ev.targetTouches[0].clientY - ev.targetTouches[1].clientY);
+            var current_gap = Math.abs(ev.changedTouches[0].clientY - ev.changedTouches[1].clientY);
             var diff = current_gap - initial_gap;
-
-            alert("diff = " + diff);
 
             // This threshold is device dependent as well as application specific
             var PINCH_THRESHHOLD = ev.target.clientWidth / 10;
@@ -137,7 +131,6 @@ function touch_end_handler(ev) {
             }
         }
         else {
-            alert("Emptying");
             tpCache = new Array();
         }
     }
