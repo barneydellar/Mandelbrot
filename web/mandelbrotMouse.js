@@ -109,7 +109,7 @@ function touch_end_handler(ev) {
 
     ev.preventDefault();
 
-    if (ev.changedTouches.length == 1 && tpCache.length == 1) {
+    if (ev.changedTouches.length == 1) {
         if (request_in_progress) {
             return;
         }
@@ -140,7 +140,7 @@ function touch_end_handler(ev) {
             if (diff > 0) {
                 scale *= 2;
             } else {
-                scale *= -2;
+                scale *= 0.5;
             }
             one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
             NewMandelbrot();
