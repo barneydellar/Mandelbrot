@@ -124,11 +124,15 @@ function touch_end_handler(ev) {
 
             // This threshold is device dependent as well as application specific
             var PINCH_THRESHHOLD = ev.target.clientWidth / 10;
-            if (Math.abs(diff) >= PINCH_THRESHHOLD) {
-                scale *= -diff;
-                one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
-                NewMandelbrot();
+            //if (Math.abs(diff) >= PINCH_THRESHHOLD) {
+            if (diff > 0) {
+                scale *= 2;
+            } else {
+                scale *= -2;
             }
+            one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
+            NewMandelbrot();
+            //}
         }
         else {
             tpCache = new Array();
