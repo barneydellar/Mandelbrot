@@ -106,13 +106,14 @@ function touch_start_handler(ev) {
     }
 }
 function touch_end_handler(ev) {
+
+    alert("targetTouches " + ev.targetTouches.length);
+    alert("touches " + ev.touches.length);
+    alert("changedTouches " + ev.changedTouches.length);
+    
     ev.preventDefault();
 
-    alert(ev);
-
-    if (ev.targetTouches.length != 2) {
-        alert("Not enough targets");
-    } else {
+    if (ev.targetTouches.length == 2) {
 
         var point1 = -1, point2 = -1;
         for (var i = 0; i < tpCache.length; i++) {
