@@ -107,7 +107,10 @@ function touch_start_handler(ev) {
 }
 function touch_end_handler(ev) {
     ev.preventDefault();
-    if (ev.targetTouches.length == 2) {
+    if (ev.targetTouches.length != 2) {
+        alert("Not enough targets");
+    } else {
+
         var point1 = -1, point2 = -1;
         for (var i = 0; i < tpCache.length; i++) {
             if (tpCache[i].identifier == ev.targetTouches[0].identifier) point1 = i;
@@ -119,6 +122,7 @@ function touch_end_handler(ev) {
             var current_gap = Math.abs(ev.targetTouches[0].clientY - ev.targetTouches[1].clientY);
             var diff = current_gap - initial_gap;
 
+            alert("diff = " + diff);
 
             // This threshold is device dependent as well as application specific
             var PINCH_THRESHHOLD = ev.target.clientWidth / 10;
@@ -129,6 +133,7 @@ function touch_end_handler(ev) {
             }
         }
         else {
+            alert("Emptying");
             tpCache = new Array();
         }
     }
