@@ -109,6 +109,18 @@ function touch_end_handler(ev) {
 
     ev.preventDefault();
 
+    if (ev.changedTouches.length == 1) {
+        if (request_in_progress) {
+            return;
+        }
+
+        var complex = ViewToComplex(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY);
+        offset_x = complex[0];
+        offset_y = complex[1];
+
+        NewMandelbrot();
+    }
+
     if (ev.changedTouches.length == 2) {
 
         var point1 = -1, point2 = -1;
@@ -122,9 +134,6 @@ function touch_end_handler(ev) {
             var current_gap = Math.abs(ev.changedTouches[0].clientY - ev.changedTouches[1].clientY);
             var diff = current_gap - initial_gap;
 
-            // This threshold is device dependent as well as application specific
-            var PINCH_THRESHHOLD = ev.target.clientWidth / 10;
-            //if (Math.abs(diff) >= PINCH_THRESHHOLD) {
             if (diff > 0) {
                 scale *= 2;
             } else {
@@ -132,7 +141,6 @@ function touch_end_handler(ev) {
             }
             one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
             NewMandelbrot();
-            //}
         }
         else {
             tpCache = new Array();
