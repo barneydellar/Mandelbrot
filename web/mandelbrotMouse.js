@@ -107,6 +107,9 @@ function touch_start_handler(ev) {
 }
 function touch_end_handler(ev) {
     ev.preventDefault();
+
+    alert(ev);
+
     if (ev.targetTouches.length != 2) {
         alert("Not enough targets");
     } else {
