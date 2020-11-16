@@ -109,7 +109,7 @@ function touch_end_handler(ev) {
 
     ev.preventDefault();
 
-    if (ev.changedTouches.length == 1) {
+    if (ev.changedTouches.length == 1 && tpCache.length == 1) {
         if (request_in_progress) {
             return;
         }
@@ -134,6 +134,9 @@ function touch_end_handler(ev) {
             var current_gap = Math.abs(ev.changedTouches[0].clientY - ev.changedTouches[1].clientY);
             var diff = current_gap - initial_gap;
 
+            alert("initial_gap: " + initial_gap);
+            alert("current_gap: " + current_gap);
+
             if (diff > 0) {
                 scale *= 2;
             } else {
@@ -142,10 +145,8 @@ function touch_end_handler(ev) {
             one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
             NewMandelbrot();
         }
-        else {
-            tpCache = new Array();
-        }
     }
+    tpCache = new Array();
 }
 
 $(document).ready(function () {
