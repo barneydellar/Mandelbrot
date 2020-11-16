@@ -109,12 +109,12 @@ function touch_end_handler(ev) {
 
     ev.preventDefault();
 
-    if (ev.changedTouches.length == 1) {
+    if (tpCache.length == 1) {
         if (request_in_progress) {
             return;
         }
 
-        var complex = ViewToComplex(ev.changedTouches[0].clientX, ev.changedTouches[0].clientY);
+        var complex = ViewToComplex(tpCache[0].clientX, tpCache[0].clientY);
         offset_x = complex[0];
         offset_y = complex[1];
 
@@ -133,9 +133,6 @@ function touch_end_handler(ev) {
             var initial_gap = Math.abs(tpCache[point2].clientY - tpCache[point1].clientY);
             var current_gap = Math.abs(ev.changedTouches[0].clientY - ev.changedTouches[1].clientY);
             var diff = current_gap - initial_gap;
-
-            alert("initial_gap: " + initial_gap);
-            alert("current_gap: " + current_gap);
 
             if (diff > 0) {
                 scale *= 2;
