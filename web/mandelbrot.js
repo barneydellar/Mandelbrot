@@ -1,6 +1,6 @@
-var offset_x = -1.749195;
-var offset_y = 0.00000001;
-var scale = 132382.72;
+var offset_x = 0;
+var offset_y = 0;
+var scale = 1;
 
 var half_h;
 var half_w;
