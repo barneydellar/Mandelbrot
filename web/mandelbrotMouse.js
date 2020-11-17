@@ -131,6 +131,7 @@ $(document).ready(function () {
     mc.on("panright", function (ev) {
         newLocation();
     });
+
     //mc.add(new Hammer.Tap({ event: 'doubletap', taps: 2 }));
     //mc.add(new Hammer.Tap({ event: 'singletap' }));
     //mc.get('doubletap').recognizeWith('singletap');
@@ -151,7 +152,7 @@ $(document).ready(function () {
     //    document.addEventListener('DOMMouseScroll', zoom_handler, false);
     //    document.addEventListener("keydown", doKeyDown, true);
     //}
-    //document.onmousewheel = zoom_handler;
+    document.onmousewheel = zoom_handler;
 
     SetUp();
 });
