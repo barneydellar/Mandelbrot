@@ -14,6 +14,10 @@ function zoom(amount) {
         return;
     }
     scale *= amount;
+
+    scale = Math.min(scale, 600000000000)
+    scale = Math.max(scale, 0.2)
+
     one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
 }
 
@@ -126,10 +130,10 @@ $(document).ready(function () {
         if (ev.direction == Hammer.DIRECTION_RIGHT || ev.direction == Hammer.DIRECTION_LEFT) {
             newPalette();
         } else if (ev.direction == Hammer.DIRECTION_UP) {
-            zoom(2);
+            zoom(1 + Math.abs(ev.velocity));
             NewMandelbrot();
         } else if (ev.direction == Hammer.DIRECTION_DOWN) {
-            zoom(0.5);
+            zoom(1 / (1 + Math.abs(ev.velocity)));
             NewMandelbrot();
         }
     });
