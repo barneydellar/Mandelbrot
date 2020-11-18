@@ -1,4 +1,4 @@
-var offset_x = 0;
+var offset_x = -0.5;
 var offset_y = 0;
 var scale = 1;
 
