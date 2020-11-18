@@ -125,33 +125,14 @@ $(document).ready(function () {
         zoom(2);
         NewMandelbrot();
     });
-    mc.on("panleft", function (ev) {
-        newPalette();
+    mc.on("swipe", function (ev) {
+        if (ev.direction == 4) {
+            newLocation();
+        } else {
+            newPalette();
+        }
     });
-    mc.on("panright", function (ev) {
-        newLocation();
-    });
 
-    //mc.add(new Hammer.Tap({ event: 'doubletap', taps: 2 }));
-    //mc.add(new Hammer.Tap({ event: 'singletap' }));
-    //mc.get('doubletap').recognizeWith('singletap');
-    //mc.get('singletap').requireFailure('doubletap');
-    //mc.get('singletap').set({ enable: true });
-
-    //mc.on("singletap", function (ev) {
-    //    alert("fs");
-        //setLocation(ev.center.x, ev.center.y);
-    //});
-    //mc.on("doubletap", function (ev) {
-    //    alert("ghj");
-        //setLocation(ev.center.x, ev.center.y);
-        //zoom(2);
-    //});
-
-    //if (window.addEventListener) {
-    //    document.addEventListener('DOMMouseScroll', zoom_handler, false);
-    //    document.addEventListener("keydown", doKeyDown, true);
-    //}
     document.onmousewheel = zoom_handler;
 
     SetUp();
