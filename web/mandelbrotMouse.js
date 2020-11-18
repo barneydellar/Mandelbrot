@@ -116,20 +116,23 @@ $(document).ready(function () {
     var canvas = document.getElementById('MandelbrotCanvas');
 
     var mc = new Hammer(canvas);
+    mc.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
+
     mc.on("tap", function (ev) {
         setLocation(ev.center.x, ev.center.y);
         NewMandelbrot();
     });
-    mc.on("press", function (ev) {
-        setLocation(ev.center.x, ev.center.y);
-        zoom(2);
-        NewMandelbrot();
-    });
     mc.on("swipe", function (ev) {
-        if (ev.direction == 4) {
+        if (ev.direction == Hammer.DIRECTION_RIGHT) {
             newLocation();
-        } else {
+        } else if (ev.direction == Hammer.DIRECTION_LEFT) {
             newPalette();
+        } else if (ev.direction == Hammer.DIRECTION_UP) {
+            zoom(2);
+            NewMandelbrot();
+        } else if (ev.direction == Hammer.DIRECTION_DOWN) {
+            zoom(0.5);
+            NewMandelbrot();
         }
     });
 
