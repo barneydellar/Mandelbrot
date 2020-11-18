@@ -123,7 +123,6 @@ $(document).ready(function () {
         NewMandelbrot();
     });
     mc.on("swipe", function (ev) {
-        alert(JSON.stringify(ev));
         if (ev.direction == Hammer.DIRECTION_RIGHT || ev.direction == Hammer.DIRECTION_LEFT) {
             newPalette();
         } else if (ev.direction == Hammer.DIRECTION_UP) {
