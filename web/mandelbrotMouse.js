@@ -4,6 +4,14 @@ var request_in_progress = false;
 
 //-------------------------------------------------------------------------------------
 
+function updateUrl() {
+    var queryParams = new URLSearchParams(window.location.search);
+    queryParams.set("x", offset_x);
+    queryParams.set("y", offset_y);
+    queryParams.set("s", scale);
+    history.replaceState(null, null, "?" + queryParams.toString());
+}
+
 function zoom(amount) {
 
     if (request_in_progress) {
@@ -18,8 +26,9 @@ function zoom(amount) {
     scale = Math.min(scale, 600000000000)
     scale = Math.max(scale, 0.2)
 
-    SetOneOverMinHalf();
+    one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
     NewMandelbrot();
+    updateUrl();
 }
 
 function setLocation(x, y) {
@@ -31,6 +40,7 @@ function setLocation(x, y) {
     offset_x = complex[0];
     offset_y = complex[1];
     NewMandelbrot();
+    updateUrl();
 }
 
 function zoom_handler(event) {
@@ -86,6 +96,21 @@ function validAngle(angle) {
 }
 
 $(document).ready(function () {
+
+    const urlParams = new URLSearchParams(window.location.search);
+    xParam = urlParams.get('x');
+    if (xParam) {
+        offset_x = parseFloat(xParam);
+    }
+    yParam = urlParams.get('y');
+    if (yParam) {
+        offset_y = parseFloat(yParam);
+    }
+    sParam = urlParams.get('s');
+    if (sParam) {
+        scale = parseFloat(sParam);
+    }
+
     var canvas = document.getElementById('MandelbrotCanvas');
 
     var mc = new Hammer(canvas);
@@ -110,6 +135,7 @@ $(document).ready(function () {
     document.onmousewheel = zoom_handler;
 
     SetUp();
+    updateUrl();
 });
 
 $(window).resize(function () {
