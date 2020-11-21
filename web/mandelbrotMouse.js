@@ -94,6 +94,12 @@ $(document).ready(function () {
     canvas.style.background = "black";
     context = canvas.getContext("2d");
 
+    imageObject = new Image();
+    imageObject.onload = function () {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(imageObject, 0, 0);
+    }
+
     var mc = new Hammer(canvas);
     mc.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
     mc.get('pinch').set({ enable: true });
@@ -114,14 +120,7 @@ $(document).ready(function () {
         if (request_in_progress) {
             return;
         }
-
         StopColourLoop();
-        imageObject = new Image();
-        imageObject.onload = function () {
-            
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            context.drawImage(imageObject, 0, 0);
-        }
         imageObject.src = canvas.toDataURL();
     });
     mc.on("pinchin pinchout", function (ev) {
