@@ -93,10 +93,12 @@ $(document).ready(function () {
     var canvas = document.getElementById('MandelbrotCanvas');
     canvas.style.background = "black";
     context = canvas.getContext("2d");
+    width = canvas.width;
+    height = canvas.height;
 
     imageObject = new Image();
     imageObject.onload = function () {
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.clearRect(0, 0, width, height);
         context.drawImage(imageObject, 0, 0);
     }
 
@@ -135,9 +137,9 @@ $(document).ready(function () {
         
         translation_factor = (new_scale - 1) / (2 * new_scale);
         context.scale(new_scale, new_scale);
-        context.translate(delta_x - canvas.width * translation_factor, delta_y - canvas.height * translation_factor);
+        context.translate(delta_x - width * translation_factor, delta_y - height * translation_factor);
 
-        context.rect(0, 0, canvas.width, canvas.height);
+        context.rect(0, 0, width, height);
         context.fillStyle = "black";
         context.fill();
 
@@ -149,7 +151,7 @@ $(document).ready(function () {
         if (request_in_progress) {
             return;
         }
-        setLocation(canvas.width * 0.5 - ev.deltaX, canvas.height * 0.5 - ev.deltaY);
+        setLocation(width * 0.5 - ev.deltaX, height * 0.5 - ev.deltaY);
         zoom(ev.scale);
     });
 
