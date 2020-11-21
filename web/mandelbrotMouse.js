@@ -1,6 +1,9 @@
 
 var tpCache = new Array()
 var request_in_progress = false;
+var width;
+var height;
+var canvas;
 
 //-------------------------------------------------------------------------------------
 
@@ -90,7 +93,7 @@ $(document).ready(function () {
         scale = parseFloat(sParam);
     }
 
-    var canvas = document.getElementById('MandelbrotCanvas');
+    canvas = document.getElementById('MandelbrotCanvas');
     canvas.style.background = "black";
     context = canvas.getContext("2d");
     width = canvas.width;
@@ -169,6 +172,8 @@ $(document).ready(function () {
 });
 
 $(window).resize(function () {
+    width = canvas.width;
+    height = canvas.height;
     StopColourLoop();
     setTimeout(
         () => {
