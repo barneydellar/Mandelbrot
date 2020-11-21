@@ -39,8 +39,6 @@ function setLocation(x, y) {
     var complex = ViewToComplex(x, y);
     offset_x = complex[0];
     offset_y = complex[1];
-    NewMandelbrot();
-    updateUrl();
 }
 
 function zoom_handler(event) {
@@ -112,6 +110,7 @@ $(document).ready(function () {
     }
 
     var canvas = document.getElementById('MandelbrotCanvas');
+    canvas.style.background = "black";
 
     var mc = new Hammer(canvas);
     mc.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
@@ -119,6 +118,9 @@ $(document).ready(function () {
 
     mc.on("tap", function (ev) {
         setLocation(ev.center.x, ev.center.y);
+
+        NewMandelbrot();
+        updateUrl();
     });
 
     var imageObject;
@@ -134,22 +136,22 @@ $(document).ready(function () {
     });
     mc.on("pinchin pinchout", function (ev) {
         new_scale = ev.scale;
+        delta_x = ev.deltaX;
+        delta_y = ev.deltaY;
+
         context = canvas.getContext("2d");
-        context.rect(0, 0, canvas.width, canvas.height);
-        context.fillStyle = "black";
-        context.fill();
 
         context.save();
         translation_factor = (new_scale - 1) / (2 * new_scale);
         context.scale(new_scale, new_scale);
-        context.translate(-canvas.width * translation_factor, -canvas.height * translation_factor);
+        context.translate(delta_x - canvas.width * translation_factor, delta_y - canvas.height * translation_factor);
         context.drawImage(imageObject, 0, 0);
         context.restore();
     });
     mc.on("pinchend", function (ev) {
+        setLocation(canvas.width * 0.5 + ev.deltaX, ev.center.y + ev.deltaY);
         zoom(ev.scale);
     });
-
 
     mc.on("swipe", function (ev) {
 
