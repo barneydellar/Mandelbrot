@@ -99,6 +99,10 @@ $(document).ready(function () {
     mc.get('pinch').set({ enable: true });
 
     mc.on("tap", function (ev) {
+        if (request_in_progress) {
+            return;
+        }
+
         setLocation(ev.center.x, ev.center.y);
 
         NewMandelbrot();
@@ -107,6 +111,10 @@ $(document).ready(function () {
 
     var imageObject;
     mc.on("pinchstart", function (ev) {
+        if (request_in_progress) {
+            return;
+        }
+
         StopColourLoop();
         imageObject = new Image();
         imageObject.onload = function () {
@@ -117,6 +125,9 @@ $(document).ready(function () {
         imageObject.src = canvas.toDataURL();
     });
     mc.on("pinchin pinchout", function (ev) {
+        if (request_in_progress) {
+            return;
+        }
         new_scale = ev.scale;
         delta_x = ev.deltaX;
         delta_y = ev.deltaY;
@@ -136,11 +147,17 @@ $(document).ready(function () {
         context.restore();
     });
     mc.on("pinchend", function (ev) {
+        if (request_in_progress) {
+            return;
+        }
         setLocation(canvas.width * 0.5 - ev.deltaX, canvas.height * 0.5 - ev.deltaY);
         zoom(ev.scale);
     });
 
     mc.on("swipe", function (ev) {
+        if (request_in_progress) {
+            return;
+        }
         newPalette();
     });
 
