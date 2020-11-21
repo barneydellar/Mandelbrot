@@ -120,7 +120,6 @@ $(document).ready(function () {
         updateUrl();
     });
 
-    var imageObject;
     mc.on("pinchstart", function (ev) {
         if (request_in_progress) {
             return;
