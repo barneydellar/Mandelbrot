@@ -133,7 +133,7 @@ $(document).ready(function () {
         context.restore();
     });
     mc.on("pinchend", function (ev) {
-        setLocation(canvas.width * 0.5 + ev.deltaX, canvas.height * 0.5 - ev.deltaY);
+        setLocation(canvas.width * 0.5 - ev.deltaX, canvas.height * 0.5 - ev.deltaY);
         zoom(ev.scale);
     });
 
