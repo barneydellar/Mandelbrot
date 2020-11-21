@@ -121,7 +121,7 @@ $(document).ready(function () {
         setLocation(ev.center.x, ev.center.y);
     });
     mc.on("pinchend", function (ev) {
-        alert("Pinch!");
+        alert(JSON.stringify(ev));
     });
     mc.on("swipe", function (ev) {
         if (!validAngle(ev.angle)) {
