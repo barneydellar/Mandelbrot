@@ -120,10 +120,39 @@ $(document).ready(function () {
     mc.on("tap", function (ev) {
         setLocation(ev.center.x, ev.center.y);
     });
-    mc.on("pinchend", function (ev) {
-        alert(JSON.stringify(ev));
+
+    var imageObject;
+    mc.on("pinchstart", function (ev) {
+        StopColourLoop();
+        imageObject = new Image();
+        imageObject.onload = function () {
+            context = canvas.getContext("2d");
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(imageObject, 0, 0);
+        }
+        imageObject.src = canvas.toDataURL();
     });
+    mc.on("pinchin pinchout", function (ev) {
+        new_scale = ev.scale;
+        context = canvas.getContext("2d");
+        context.rect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "black";
+        context.fill();
+
+        context.save();
+        translation_factor = (new_scale - 1) / (2 * new_scale);
+        context.scale(new_scale, new_scale);
+        context.translate(-canvas.width * translation_factor, -canvas.height * translation_factor);
+        context.drawImage(imageObject, 0, 0);
+        context.restore();
+    });
+    mc.on("pinchend", function (ev) {
+        zoom(ev.scale);
+    });
+
+
     mc.on("swipe", function (ev) {
+
         if (!validAngle(ev.angle)) {
             return;
         }
