@@ -106,8 +106,13 @@ $(document).ready(function () {
     }
 
     var mc = new Hammer(canvas);
+
+    var pinch = new Hammer.Pinch();
+
+    mc.add([pinch]);
+
     mc.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
-    mc.get('pinch').set({ enable: true });
+    //mc.get('pinch').set({ enable: true });
 
     mc.on("tap", function (ev) {
         if (request_in_progress) {
@@ -135,7 +140,7 @@ $(document).ready(function () {
     var delta_x;
     var delta_y;
     var translation_factor;
-    mc.on("pinchin pinchout", function (ev) {
+    mc.on("pinchmove", function (ev) {
         if (request_in_progress) {
             return;
         }
