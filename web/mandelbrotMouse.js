@@ -130,6 +130,11 @@ $(document).ready(function () {
 
         imageObject.src = canvas.toDataURL();
     });
+    
+    var new_scale;
+    var delta_x;
+    var delta_y;
+    var translation_factor;
     mc.on("pinchin pinchout", function (ev) {
         if (request_in_progress) {
             return;
