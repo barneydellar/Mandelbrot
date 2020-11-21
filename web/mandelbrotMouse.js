@@ -115,9 +115,13 @@ $(document).ready(function () {
 
     var mc = new Hammer(canvas);
     mc.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
+    mc.get('pinch').set({ enable: true });
 
     mc.on("tap", function (ev) {
         setLocation(ev.center.x, ev.center.y);
+    });
+    mc.on("pinchend", function (ev) {
+        alert("Pinch!");
     });
     mc.on("swipe", function (ev) {
         if (!validAngle(ev.angle)) {
