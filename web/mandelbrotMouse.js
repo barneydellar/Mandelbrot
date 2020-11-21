@@ -129,7 +129,7 @@ $(document).ready(function () {
         if (request_in_progress) {
             return;
         }
-        StopColourLoop(); 
+        //StopColourLoop(); 
         width = canvas.width;
         height = canvas.height;
 
