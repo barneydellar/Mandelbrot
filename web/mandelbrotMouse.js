@@ -111,6 +111,7 @@ $(document).ready(function () {
 
     var canvas = document.getElementById('MandelbrotCanvas');
     canvas.style.background = "black";
+    context = canvas.getContext("2d");
 
     var mc = new Hammer(canvas);
     mc.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
@@ -128,7 +129,7 @@ $(document).ready(function () {
         StopColourLoop();
         imageObject = new Image();
         imageObject.onload = function () {
-            context = canvas.getContext("2d");
+            
             context.clearRect(0, 0, canvas.width, canvas.height);
             context.drawImage(imageObject, 0, 0);
         }
@@ -139,9 +140,11 @@ $(document).ready(function () {
         delta_x = ev.deltaX;
         delta_y = ev.deltaY;
 
-        context = canvas.getContext("2d");
-
         context.save();
+        context.rect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "black";
+        context.fill();
+
         translation_factor = (new_scale - 1) / (2 * new_scale);
         context.scale(new_scale, new_scale);
         context.translate(delta_x - canvas.width * translation_factor, delta_y - canvas.height * translation_factor);
@@ -149,7 +152,7 @@ $(document).ready(function () {
         context.restore();
     });
     mc.on("pinchend", function (ev) {
-        setLocation(canvas.width * 0.5 + ev.deltaX, ev.center.y + ev.deltaY);
+        setLocation(canvas.width * 0.5 + ev.deltaX, canvas.height * 0.5 - ev.deltaY);
         zoom(ev.scale);
     });
 
