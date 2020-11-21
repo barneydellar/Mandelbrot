@@ -74,25 +74,6 @@ function newPalette() {
     CopySmallPaletteIntoLargeOne();
 }
 
-function validAngle(angle) {
-
-    tolerance = 10;
-
-    function nearlyRight(angle) {
-        return Math.abs(angle) < tolerance;
-    }
-    function nearlyLeft(angle) {
-        return Math.abs(180 - Math.abs(angle)) < tolerance;
-    }
-    function nearlyVertical(angle) {
-        return Math.abs(90 - Math.abs(angle)) < tolerance;
-    }
-
-    return nearlyRight(angle) ||
-           nearlyLeft(angle) ||
-           nearlyVertical(angle);
-}
-
 $(document).ready(function () {
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -157,17 +138,7 @@ $(document).ready(function () {
     });
 
     mc.on("swipe", function (ev) {
-
-        if (!validAngle(ev.angle)) {
-            return;
-        }
-        if (ev.direction == Hammer.DIRECTION_RIGHT || ev.direction == Hammer.DIRECTION_LEFT) {
-            newPalette();
-        } else if (ev.direction == Hammer.DIRECTION_UP) {
-            zoom(1 + Math.abs(ev.velocity));
-        } else if (ev.direction == Hammer.DIRECTION_DOWN) {
-            zoom(1 / (1 + Math.abs(ev.velocity)));
-        }
+        newPalette();
     });
 
     document.onmousewheel = zoom_handler;
