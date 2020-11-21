@@ -122,14 +122,14 @@ $(document).ready(function () {
         delta_y = ev.deltaY;
 
         context.save();
-        context.rect(0, 0, canvas.width, canvas.height);
-        context.fillStyle = "black";
-        context.fill();
-
+        
         translation_factor = (new_scale - 1) / (2 * new_scale);
         context.scale(new_scale, new_scale);
         context.translate(delta_x - canvas.width * translation_factor, delta_y - canvas.height * translation_factor);
+        
+        context.clearRect(0, 0, canvas.width, canvas.height);
         context.drawImage(imageObject, 0, 0);
+        
         context.restore();
     });
     mc.on("pinchend", function (ev) {
