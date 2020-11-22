@@ -153,10 +153,9 @@ $(document).ready(function () {
         translation_factor = (new_scale - 1) / (2 * new_scale);
         context.scale(new_scale, new_scale);
         context.translate(delta_x - width * translation_factor, delta_y - height * translation_factor);
+        context.clearRect(0, 0, width, height);
+        context.drawImage(imageObject, 0, 0);
         context.restore();
-
-        //newPalette();
-
     });
     mc.on("pinchend", function (ev) {
         if (request_in_progress) {
