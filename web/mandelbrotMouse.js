@@ -171,7 +171,6 @@ $(document).ready(function () {
     mc.get('press').set({ enable: true });
 
     mc.on("pinchstart", function (ev) {
-        alert("fsfds");
         if (ev.maxPointers <= 1) {
             return;
         }
@@ -192,14 +191,12 @@ $(document).ready(function () {
     });
     mc.on("panmove", function (ev) {
         if (ev.maxPointers > 1) {
-            alert("rrewer");
             return;
         }
         dragMove(ev);
     });
 
     mc.on("pinchend", function (ev) {
-        alert("yytyt");
         if (ev.maxPointers <= 1) {
             return;
         }
