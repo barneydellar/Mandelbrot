@@ -5,6 +5,12 @@ var width;
 var height;
 var canvas;
 
+var new_scale;
+var delta_x;
+var delta_y;
+var translation_factor;
+var imageObject = new Image();
+
 //-------------------------------------------------------------------------------------
 
 function updateUrl() {
@@ -16,14 +22,12 @@ function updateUrl() {
 }
 
 function limitZoom(s) {
-
     s = Math.min(s, 600000000000)
     s = Math.max(s, 0.2)
     return s;
 }
 
 function zoom(amount) {
-
     if (request_in_progress) {
         return;
     }
@@ -68,6 +72,7 @@ function zoom_handler(event) {
         amount = -1/delta;
     }
 
+    StopColourLoop();
     zoom(amount);
 }
 
@@ -78,6 +83,55 @@ function newPalette() {
     small_palette = CreatePalette(small_palette_size);
     palette_counter = 0;
     CopySmallPaletteIntoLargeOne();
+}
+
+function dragStart(ev) {
+    if (request_in_progress) {
+        return;
+    }
+    StopColourLoop();
+    width = canvas.width;
+    height = canvas.height;
+
+    imageObject.src = canvas.toDataURL();
+}
+
+function dragMove(ev) {
+    if (request_in_progress) {
+        return;
+    }
+    new_scale = limitZoom(ev.scale);
+
+    delta_x = ev.deltaX;
+    delta_y = ev.deltaY;
+
+    if (delta_x === 0 && delta_y === 0 && new_scale === 1) {
+        return;
+    }
+
+    context.clearRect(0, 0, width, height);
+    context.save();
+
+    context.rect(0, 0, width, height);
+    context.fillStyle = "black";
+    context.fill();
+
+    translation_factor = (new_scale - 1) / (2 * new_scale);
+    context.scale(new_scale, new_scale);
+    context.translate(delta_x - width * translation_factor, delta_y - height * translation_factor);
+
+    context.drawImage(imageObject, 0, 0);
+    context.restore();
+}
+
+function dragEnd(ev) {
+    if (request_in_progress) {
+        return;
+    }
+    new_scale = limitZoom(ev.scale);
+
+    setLocation(width * 0.5 - ev.deltaX, height * 0.5 - ev.deltaY);
+    zoom(new_scale);
 }
 
 $(document).ready(function () {
@@ -102,7 +156,6 @@ $(document).ready(function () {
     width = canvas.width;
     height = canvas.height;
 
-    imageObject = new Image();
     imageObject.onload = function () {
         context.clearRect(0, 0, width, height);
         context.drawImage(imageObject, 0, 0);
@@ -110,62 +163,56 @@ $(document).ready(function () {
 
     var mc = new Hammer(canvas);
 
-    mc.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
+    mc.get('tap').set({ enable: false });
+    mc.get('swipe').set({ enable: false });
+
     mc.get('pinch').set({ enable: true });
-    mc.get('doubletap').set({ enable: true });
+    mc.get('pan').set({ enable: true });
+    mc.get('press').set({ enable: true });
 
-
-    mc.on("pinchstart panstart", function (ev) {
-        if (request_in_progress) {
+    mc.on("pinchstart", function (ev) {
+        alert("fsfds");
+        if (ev.maxPointers <= 1) {
             return;
         }
-        StopColourLoop(); 
-        width = canvas.width;
-        height = canvas.height;
-
-        imageObject.src = canvas.toDataURL();
+        dragStart(ev);
     });
-    
-    var new_scale;
-    var delta_x;
-    var delta_y;
-    var translation_factor;
-    mc.on("pinchmove panmove", function (ev) {
-        if (request_in_progress) {
+    mc.on("panstart", function (ev) {
+        if (ev.maxPointers > 1) {
             return;
         }
-        new_scale = limitZoom(ev.scale);
-
-        delta_x = ev.deltaX;
-        delta_y = ev.deltaY;
-
-        context.save();
-
-        context.clearRect(0, 0, width, height);
-
-        context.rect(0, 0, width, height);
-        context.fillStyle = "black";
-        context.fill();
-
-        translation_factor = (new_scale - 1) / (2 * new_scale);
-        context.scale(new_scale, new_scale);
-        context.translate(delta_x - width * translation_factor, delta_y - height * translation_factor);
-
-        context.drawImage(imageObject, 0, 0);
-        context.restore();
+        dragStart(ev);
     });
 
-    mc.on("pinchend panend", function (ev) {
-        if (request_in_progress) {
+    mc.on("pinchmove", function (ev) {
+        if (ev.maxPointers <= 1) {
             return;
         }
-        new_scale = limitZoom(ev.scale);
-
-        setLocation(width * 0.5 - ev.deltaX, height * 0.5 - ev.deltaY);
-        zoom(new_scale);
+        dragMove(ev);
+    });
+    mc.on("panmove", function (ev) {
+        if (ev.maxPointers > 1) {
+            alert("rrewer");
+            return;
+        }
+        dragMove(ev);
     });
 
-    mc.on("doubletap", function (ev) {
+    mc.on("pinchend", function (ev) {
+        alert("yytyt");
+        if (ev.maxPointers <= 1) {
+            return;
+        }
+        dragEnd(ev);
+    });
+    mc.on("panend", function (ev) {
+        if (ev.maxPointers > 1) {
+            return;
+        }
+        dragEnd(ev);
+    });
+
+    mc.on("press", function (ev) {
         if (request_in_progress) {
             return;
         }
