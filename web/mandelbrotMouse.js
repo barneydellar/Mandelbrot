@@ -129,7 +129,7 @@ $(document).ready(function () {
         if (request_in_progress) {
             return;
         }
-        //StopColourLoop(); 
+        StopColourLoop(); 
         width = canvas.width;
         height = canvas.height;
 
@@ -158,11 +158,11 @@ $(document).ready(function () {
         //context.fillStyle = "black";
         //context.fill();
 
-        //context.drawImage(imageObject, 0, 0);
+        context.drawImage(imageObject, 0, 0);
         
         context.restore();
 
-        newPalette();
+        //newPalette();
 
     });
     mc.on("pinchend", function (ev) {
