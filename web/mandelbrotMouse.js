@@ -15,6 +15,13 @@ function updateUrl() {
     history.replaceState(null, null, "?" + queryParams.toString());
 }
 
+function limitZoom(s) {
+
+    s = Math.min(s, 600000000000)
+    s = Math.max(s, 0.2)
+    return s;
+}
+
 function zoom(amount) {
 
     if (request_in_progress) {
@@ -26,8 +33,7 @@ function zoom(amount) {
     }
     scale *= amount;
 
-    scale = Math.min(scale, 600000000000)
-    scale = Math.max(scale, 0.2)
+    scale = limitZoom(scale);
 
     one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
     NewMandelbrot();
@@ -50,12 +56,9 @@ function zoom_handler(event) {
 
     if (!event) event = window.event;
 
-    // normalize the delta
     if (event.wheelDelta) {
-        // IE and Opera
         delta = event.wheelDelta / 60;
     } else if (event.detail) {
-        // W3C
         delta = -event.detail / 2;
     }
 
@@ -105,20 +108,24 @@ $(document).ready(function () {
         context.drawImage(imageObject, 0, 0);
     }
 
+    var mcman = new Hammer.Manager(canvas);
     var mc = new Hammer(canvas);
 
     mc.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
     mc.get('pinch').set({ enable: true });
 
-    mc.on("tap", function (ev) {
+
+    mcman.add(new Hammer.Tap({ event: 'doubletap', taps: 2 }));
+    mcman.add(new Hammer.Tap({ event: 'singletap' }));
+
+    mcman.get('doubletap').recognizeWith('singletap');
+    mcman.get('singletap').requireFailure('doubletap');
+
+    mcman.on("doubletap", function (ev) {
         if (request_in_progress) {
             return;
         }
-
-        setLocation(ev.center.x, ev.center.y);
-
-        NewMandelbrot();
-        updateUrl();
+        newPalette();
     });
 
     mc.on("pinchstart panstart", function (ev) {
@@ -136,67 +143,42 @@ $(document).ready(function () {
     var delta_x;
     var delta_y;
     var translation_factor;
-    mc.on("pinchmove", function (ev) {
+    mc.on("pinchmove panmove", function (ev) {
         if (request_in_progress) {
             return;
         }
-        new_scale = ev.scale;
+        new_scale = 1;
+        if (ev.type === "pinchmove") {
+            new_scale = limitZoom(ev.scale);
+        }
         delta_x = ev.deltaX;
         delta_y = ev.deltaY;
 
         context.save();
-        
+
+        context.rect(0, 0, width, height);
+        context.fillStyle = "black";
+        context.fill();
+
         translation_factor = (new_scale - 1) / (2 * new_scale);
         context.scale(new_scale, new_scale);
         context.translate(delta_x - width * translation_factor, delta_y - height * translation_factor);
         context.clearRect(0, 0, width, height);
-      
-        context.fillStyle = "black";
-        context.fillRect(0, 0, width, height);
         
         context.drawImage(imageObject, 0, 0);
         context.restore();
     });
 
-     mc.on("panmove", function (ev) {
+    mc.on("pinchend panend", function (ev) {
         if (request_in_progress) {
             return;
         }
-        delta_x = ev.deltaX;
-        delta_y = ev.deltaY;
-
-        context.save();
-        
-        context.translate(delta_x - width, delta_y - height);
-        context.clearRect(0, 0, width, height);
-        context.fillStyle = "black";
-        context.fillRect(0, 0, width, height);
-        context.drawImage(imageObject, 0, 0);
-        context.restore();
-    });
-
-    mc.on("pinchend", function (ev) {
-        if (request_in_progress) {
-            return;
+        new_scale = 1;
+        if (ev.type === "pinchmove") {
+            new_scale = limitZoom(ev.scale);
         }
         setLocation(width * 0.5 - ev.deltaX, height * 0.5 - ev.deltaY);
-        zoom(ev.scale);
-    });
-
-    mc.on("panend", function (ev) {
-        if (request_in_progress) {
-            return;
-        }
-        setLocation(width * 0.5 - ev.deltaX, height * 0.5 - ev.deltaY);
-        NewMandelbrot();
-        updateUrl();
-    });
-
-    mc.on("swipe", function (ev) {
-        if (request_in_progress) {
-            return;
-        }
-        newPalette();
+        zoom(new_scale);
     });
 
     document.onmousewheel = zoom_handler;
