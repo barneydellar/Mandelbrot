@@ -144,15 +144,15 @@ $(document).ready(function () {
         if (request_in_progress) {
             return;
         }
-        //new_scale = ev.scale;
-        //delta_x = ev.deltaX;
-        //delta_y = ev.deltaY;
+        new_scale = ev.scale;
+        delta_x = ev.deltaX;
+        delta_y = ev.deltaY;
 
-        //context.save();
+        context.save();
         
-        //translation_factor = (new_scale - 1) / (2 * new_scale);
-        //context.scale(new_scale, new_scale);
-        //context.translate(delta_x - width * translation_factor, delta_y - height * translation_factor);
+        translation_factor = (new_scale - 1) / (2 * new_scale);
+        context.scale(new_scale, new_scale);
+        context.translate(delta_x - width * translation_factor, delta_y - height * translation_factor);
 
         //context.rect(0, 0, width, height);
         //context.fillStyle = "black";
@@ -160,7 +160,7 @@ $(document).ready(function () {
 
         //context.drawImage(imageObject, 0, 0);
         
-        //context.restore();
+        context.restore();
 
         newPalette();
 
