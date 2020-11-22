@@ -158,7 +158,6 @@ $(document).ready(function () {
         if (request_in_progress) {
             return;
         }
-        console.log(JSON.stringify(ev));
         new_scale = limitZoom(ev.scale);
 
         setLocation(width * 0.5 - ev.deltaX, height * 0.5 - ev.deltaY);
