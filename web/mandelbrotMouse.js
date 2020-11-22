@@ -108,25 +108,12 @@ $(document).ready(function () {
         context.drawImage(imageObject, 0, 0);
     }
 
-    var mcman = new Hammer.Manager(canvas);
     var mc = new Hammer(canvas);
 
     mc.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
     mc.get('pinch').set({ enable: true });
+    mc.get('doubletap').set({ enable: true });
 
-
-    mcman.add(new Hammer.Tap({ event: 'doubletap', taps: 2 }));
-    mcman.add(new Hammer.Tap({ event: 'singletap' }));
-
-    mcman.get('doubletap').recognizeWith('singletap');
-    mcman.get('singletap').requireFailure('doubletap');
-
-    mcman.on("doubletap", function (ev) {
-        if (request_in_progress) {
-            return;
-        }
-        newPalette();
-    });
 
     mc.on("pinchstart panstart", function (ev) {
         if (request_in_progress) {
@@ -179,6 +166,13 @@ $(document).ready(function () {
         }
         setLocation(width * 0.5 - ev.deltaX, height * 0.5 - ev.deltaY);
         zoom(new_scale);
+    });
+
+    mc.on("doubletap", function (ev) {
+        if (request_in_progress) {
+            return;
+        }
+        newPalette();
     });
 
     document.onmousewheel = zoom_handler;
