@@ -134,10 +134,8 @@ $(document).ready(function () {
         if (request_in_progress) {
             return;
         }
-        new_scale = 1;
-        if (ev.type === "pinchmove") {
-            new_scale = limitZoom(ev.scale);
-        }
+        new_scale = limitZoom(ev.scale);
+
         delta_x = ev.deltaX;
         delta_y = ev.deltaY;
 
@@ -160,10 +158,9 @@ $(document).ready(function () {
         if (request_in_progress) {
             return;
         }
-        new_scale = 1;
-        if (ev.type === "pinchmove") {
-            new_scale = limitZoom(ev.scale);
-        }
+        console.log(JSON.stringify(ev));
+        new_scale = limitZoom(ev.scale);
+
         setLocation(width * 0.5 - ev.deltaX, height * 0.5 - ev.deltaY);
         zoom(new_scale);
     });
