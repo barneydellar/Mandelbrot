@@ -112,9 +112,9 @@ function dragMove(ev) {
     context.clearRect(0, 0, width, height);
     context.save();
 
-    context.rect(0, 0, width, height);
-    context.fillStyle = "black";
-    context.fill();
+    //context.rect(0, 0, width, height);
+    //context.fillStyle = "black";
+    //context.fill();
 
     translation_factor = (new_scale - 1) / (2 * new_scale);
     context.scale(new_scale, new_scale);
