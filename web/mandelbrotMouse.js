@@ -156,7 +156,7 @@ $(document).ready(function () {
         context.clearRect(0, 0, width, height);
         if (new_scale < 1) {
             context.fillStyle = "black";
-            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.fillRect(0, 0, width, height);
         }
         context.drawImage(imageObject, 0, 0);
         context.restore();
