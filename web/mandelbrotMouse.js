@@ -107,12 +107,8 @@ $(document).ready(function () {
 
     var mc = new Hammer(canvas);
 
-    var pinch = new Hammer.Pinch();
-
-    mc.add([pinch]);
-
     mc.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
-    //mc.get('pinch').set({ enable: true });
+    mc.get('pinch').set({ enable: true });
 
     mc.on("tap", function (ev) {
         if (request_in_progress) {
@@ -125,7 +121,7 @@ $(document).ready(function () {
         updateUrl();
     });
 
-    mc.on("pinchstart", function (ev) {
+    mc.on("pinchstart panstart", function (ev) {
         if (request_in_progress) {
             return;
         }
@@ -154,19 +150,46 @@ $(document).ready(function () {
         context.scale(new_scale, new_scale);
         context.translate(delta_x - width * translation_factor, delta_y - height * translation_factor);
         context.clearRect(0, 0, width, height);
-        //if (new_scale < 1) {
-            context.fillStyle = "black";
-            context.fillRect(0, 0, width, height);
-        //}
+      
+        context.fillStyle = "black";
+        context.fillRect(0, 0, width, height);
+        
         context.drawImage(imageObject, 0, 0);
         context.restore();
     });
+
+     mc.on("panmove", function (ev) {
+        if (request_in_progress) {
+            return;
+        }
+        delta_x = ev.deltaX;
+        delta_y = ev.deltaY;
+
+        context.save();
+        
+        context.translate(delta_x - width, delta_y - height);
+        context.clearRect(0, 0, width, height);
+        context.fillStyle = "black";
+        context.fillRect(0, 0, width, height);
+        context.drawImage(imageObject, 0, 0);
+        context.restore();
+    });
+
     mc.on("pinchend", function (ev) {
         if (request_in_progress) {
             return;
         }
         setLocation(width * 0.5 - ev.deltaX, height * 0.5 - ev.deltaY);
         zoom(ev.scale);
+    });
+
+    mc.on("panend", function (ev) {
+        if (request_in_progress) {
+            return;
+        }
+        setLocation(width * 0.5 - ev.deltaX, height * 0.5 - ev.deltaY);
+        NewMandelbrot();
+        updateUrl();
     });
 
     mc.on("swipe", function (ev) {
