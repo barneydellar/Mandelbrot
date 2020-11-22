@@ -154,6 +154,10 @@ $(document).ready(function () {
         context.scale(new_scale, new_scale);
         context.translate(delta_x - width * translation_factor, delta_y - height * translation_factor);
         context.clearRect(0, 0, width, height);
+        if (new_scale < 1) {
+            context.fillStyle = "black";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+        }
         context.drawImage(imageObject, 0, 0);
         context.restore();
     });
