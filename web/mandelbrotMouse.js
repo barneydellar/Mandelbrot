@@ -141,6 +141,8 @@ $(document).ready(function () {
 
         context.save();
 
+        context.clearRect(0, 0, width, height);
+
         context.rect(0, 0, width, height);
         context.fillStyle = "black";
         context.fill();
@@ -148,8 +150,7 @@ $(document).ready(function () {
         translation_factor = (new_scale - 1) / (2 * new_scale);
         context.scale(new_scale, new_scale);
         context.translate(delta_x - width * translation_factor, delta_y - height * translation_factor);
-        context.clearRect(0, 0, width, height);
-        
+
         context.drawImage(imageObject, 0, 0);
         context.restore();
     });
