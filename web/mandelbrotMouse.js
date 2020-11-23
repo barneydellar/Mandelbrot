@@ -231,7 +231,6 @@ $(document).ready(function () {
             return;
         }
         newPalette();
-        ev.stopPropagation();
     });
 
     document.onmousewheel = zoom_handler;
@@ -240,8 +239,8 @@ $(document).ready(function () {
 
     updateUrl();
 
-    window.addEventListener('selectstart', function (e) { e.preventDefault(); });
-    document.onselectstart = new function (e) { return false; };
+    canvas.addEventListener('selectstart', function (e) { e.preventDefault(); }, false);
+    canvas.addEventListener('touchstart', function (e) { e.preventDefault(); }, false);
 });
 
 $(window).resize(function () {
