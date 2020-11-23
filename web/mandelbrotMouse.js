@@ -237,9 +237,11 @@ $(document).ready(function () {
     document.onmousewheel = zoom_handler;
 
     SetUp();
+
     updateUrl();
 
     window.addEventListener('selectstart', function (e) { e.preventDefault(); });
+    document.onselectstart = new function (e) { return false; };
 });
 
 $(window).resize(function () {
