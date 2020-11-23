@@ -27,6 +27,16 @@ function limitZoom(s) {
     return s;
 }
 
+function limitPinchZoom(s) {
+    if (s * scale > 600000000000) {
+        s = 600000000000 / scale;
+    }
+    if (s * scale < 0.2) {
+        s = 0.2 / scale;
+    }
+    return s;
+}
+
 function zoom(amount) {
     if (request_in_progress) {
         return;
@@ -100,7 +110,7 @@ function dragMove(ev) {
     if (request_in_progress) {
         return;
     }
-    new_scale = limitZoom(ev.scale);
+    new_scale = limitPinchZoom(ev.scale);
 
     delta_x = ev.deltaX;
     delta_y = ev.deltaY;
@@ -111,10 +121,6 @@ function dragMove(ev) {
 
     context.clearRect(0, 0, width, height);
     context.save();
-
-    context.rect(0, 0, width, height);
-    context.fillStyle = "black";
-    context.fill();
 
     translation_factor = (new_scale - 1) / (2 * new_scale);
     context.scale(new_scale, new_scale);
@@ -128,7 +134,7 @@ function dragEnd(ev) {
     if (request_in_progress) {
         return;
     }
-    new_scale = limitZoom(ev.scale);
+    new_scale = limitPinchZoom(ev.scale);
 
     setLocation(width * 0.5 - ev.deltaX, height * 0.5 - ev.deltaY);
     zoom(new_scale);
