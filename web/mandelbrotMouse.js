@@ -167,7 +167,7 @@ $(document).ready(function () {
         context.drawImage(imageObject, 0, 0);
     }
 
-    var mc = new Hammer(canvas);
+    var mc = propagating(new Hammer(canvas));
 
     mc.get('tap').set({ enable: false });
     mc.get('swipe').set({ enable: false });
@@ -220,6 +220,7 @@ $(document).ready(function () {
             return;
         }
         newPalette();
+        ev.stopPropagation();
     });
 
     document.onmousewheel = zoom_handler;
