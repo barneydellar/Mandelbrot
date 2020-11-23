@@ -83,6 +83,17 @@ function zoom_handler(event) {
     }
 
     StopColourLoop();
+
+    imageObject.src = canvas.toDataURL();
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.save();
+
+    translation_factor = (amount - 1) / (2 * amount);
+    context.scale(amount, amount);
+
+    context.drawImage(imageObject, 0, 0);
+
     zoom(amount);
 }
 
@@ -167,7 +178,7 @@ $(document).ready(function () {
         context.drawImage(imageObject, 0, 0);
     }
 
-    var mc = propagating(new Hammer(canvas));
+    var mc = new Hammer(canvas);
 
     mc.get('tap').set({ enable: false });
     mc.get('swipe').set({ enable: false });
@@ -227,6 +238,8 @@ $(document).ready(function () {
 
     SetUp();
     updateUrl();
+
+    window.addEventListener('selectstart', function (e) { e.preventDefault(); });
 });
 
 $(window).resize(function () {
