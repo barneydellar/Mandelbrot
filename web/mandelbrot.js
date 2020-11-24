@@ -181,26 +181,36 @@ function CopySmallPaletteIntoLargeOne() {
 
 //-------------------------------------------------------------------------------------
 
+var zoom_factor = 1;
+
 function DrawCanvas() {
 
-    var canvasData = context.getImageData(0, 0, full_w, full_h);
+    var canvasData = context.createImageData(full_w, full_h);
     UpdateMainPalette();
 
     var colour;
     var canvas_index;
 
-    for (i = 0; i < escape_array.length; i++) {
+    var fraction = 1 / zoom_factor;
 
-        colour = GetColour(main_palette, main_palette_size, escape_array[i]);
+    for (j = 0; j < full_h; j++) {
+        for (i = 0; i < full_w; i++) {
 
-        canvas_index = 4 * i;
+            escape_index = Math.ceil(i * fraction) + Math.ceil(j * fraction) * Math.ceil(full_w * fraction);
+            canvas_index = 4 * (i + j * full_w);
 
-        canvasData.data[canvas_index + 0] = colour[0];
-        canvasData.data[canvas_index + 1] = colour[1];
-        canvasData.data[canvas_index + 2] = colour[2];
-        canvasData.data[canvas_index + 3] = 255;
+            colour = GetColour(main_palette, main_palette_size, escape_array[escape_index]);
+
+
+            canvasData.data[canvas_index + 0] = colour[0];
+            canvasData.data[canvas_index + 1] = colour[1];
+            canvasData.data[canvas_index + 2] = colour[2];
+            canvasData.data[canvas_index + 3] = 255;
+
+        }
     }
 
+    context.clearRect(0, 0, width, height);
     context.putImageData(canvasData, 0, 0);
 }
 
