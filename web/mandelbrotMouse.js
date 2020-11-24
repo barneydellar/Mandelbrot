@@ -151,6 +151,27 @@ function dragEnd(ev) {
     zoom(new_scale);
 }
 
+var isMobile = {
+    Android: function () {
+        return navigator.userAgent.match(/Android/i);
+    },
+    BlackBerry: function () {
+        return navigator.userAgent.match(/BlackBerry/i);
+    },
+    iOS: function () {
+        return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+    },
+    Opera: function () {
+        return navigator.userAgent.match(/Opera Mini/i);
+    },
+    Windows: function () {
+        return navigator.userAgent.match(/IEMobile/i) || navigator.userAgent.match(/WPDesktop/i);
+    },
+    any: function () {
+        return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+    }
+};
+
 $(document).ready(function () {
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -183,49 +204,7 @@ $(document).ready(function () {
     mc.get('tap').set({ enable: false });
     mc.get('swipe').set({ enable: false });
 
-    mc.get('pinch').set({ enable: true });
-    mc.get('pan').set({ enable: true });
     mc.get('press').set({ enable: true });
-
-    mc.on("pinchstart", function (ev) {
-        if (ev.maxPointers <= 1) {
-            return;
-        }
-        dragStart(ev);
-    });
-    mc.on("panstart", function (ev) {
-        if (ev.maxPointers > 1) {
-            return;
-        }
-        dragStart(ev);
-    });
-
-    mc.on("pinchmove", function (ev) {
-        if (ev.maxPointers <= 1) {
-            return;
-        }
-        dragMove(ev);
-    });
-    mc.on("panmove", function (ev) {
-        if (ev.maxPointers > 1) {
-            return;
-        }
-        dragMove(ev);
-    });
-
-    mc.on("pinchend", function (ev) {
-        if (ev.maxPointers <= 1) {
-            return;
-        }
-        dragEnd(ev);
-    });
-    mc.on("panend", function (ev) {
-        if (ev.maxPointers > 1) {
-            return;
-        }
-        dragEnd(ev);
-    });
-
     mc.on("press", function (ev) {
         if (request_in_progress) {
             return;
@@ -234,7 +213,53 @@ $(document).ready(function () {
         ev.stopPropagation();
     });
 
-    document.onmousewheel = zoom_handler;
+    if (isMobile.any()) {
+        mc.get('pinch').set({ enable: true });
+        mc.get('pan').set({ enable: false });
+
+        mc.on("pinchstart", function (ev) {
+            if (ev.maxPointers <= 1) {
+                return;
+            }
+            dragStart(ev);
+        });
+        mc.on("pinchmove", function (ev) {
+            if (ev.maxPointers <= 1) {
+                return;
+            }
+            dragMove(ev);
+        });
+        mc.on("pinchend", function (ev) {
+            if (ev.maxPointers <= 1) {
+                return;
+            }
+            dragEnd(ev);
+        });
+    } else {
+
+        mc.get('pinch').set({ enable: false });
+        mc.get('pan').set({ enable: true });
+
+        mc.on("panstart", function (ev) {
+            if (ev.maxPointers > 1) {
+                return;
+            }
+            dragStart(ev);
+        });
+        mc.on("panmove", function (ev) {
+            if (ev.maxPointers > 1) {
+                return;
+            }
+            dragMove(ev);
+        });
+        mc.on("panend", function (ev) {
+            if (ev.maxPointers > 1) {
+                return;
+            }
+            dragEnd(ev);
+        });
+        document.onmousewheel = zoom_handler;
+    }
 
     SetUp();
 
