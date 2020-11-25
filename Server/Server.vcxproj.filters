@@ -61,5 +61,11 @@
     <None Include="..\web\mandelbrotMouse.js">
       <Filter>web</Filter>
     </None>
+    <None Include="..\web\clientCall.js">
+      <Filter>web</Filter>
+    </None>
+    <None Include="..\web\serverCall.js">
+      <Filter>web</Filter>
+    </None>
   </ItemGroup>
 </Project>

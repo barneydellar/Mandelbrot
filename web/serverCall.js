@@ -6,7 +6,7 @@ function NewMandelbrot() {
     }
     StopColourLoop();
 
-    NewMandelbrotImp(16);
+    NewMandelbrotImp(4);
 }
 
 function NewMandelbrotImp(factor) {
@@ -42,7 +42,7 @@ function NewMandelbrotImp(factor) {
                 request_in_progress = false;
                 return;
             }
-            factor = factor / 2;
+            factor = Math.round(factor / 2);
             NewMandelbrotImp(factor);
 
         })

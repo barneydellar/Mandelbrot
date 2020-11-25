@@ -22,7 +22,7 @@ function NewMandelbrotImp(factor) {
     setTimeout(function () {
         factor = Math.round(factor / 2);
         NewMandelbrotImp(factor);
-    }, 10);
+    }, 1);
 }
 
 function GenerateEscapeValues(generate_width, generate_height) {
@@ -30,11 +30,14 @@ function GenerateEscapeValues(generate_width, generate_height) {
     local_one_over_min_half = 1 / (scale * Math.min(generate_width, generate_height));
 
 
+    local_half_w = generate_width * 0.5;
+    local_half_h = generate_height * 0.5;
+
     function LocalViewToComplex(x, y) {
 
         // Map (0->w) to (-1, 1);
-        var x_complex = offset_x + ((x - generate_width) * local_one_over_min_half);
-        var y_complex = offset_y + ((y - generate_height) * local_one_over_min_half);
+        var x_complex = offset_x + ((x - local_half_w) * local_one_over_min_half);
+        var y_complex = offset_y + ((y - local_half_h) * local_one_over_min_half);
 
         return ([x_complex, y_complex]);
     }

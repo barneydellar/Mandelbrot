@@ -185,9 +185,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\index.html" />
+    <None Include="..\web\clientCall.js" />
     <None Include="..\web\mandelbrot.html" />
     <None Include="..\web\mandelbrot.js" />
     <None Include="..\web\mandelbrotMouse.js" />
+    <None Include="..\web\serverCall.js" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
