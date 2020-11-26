@@ -1,6 +1,7 @@
 
 var tpCache = new Array()
 var request_in_progress = false;
+var drag_in_progress = false;
 var width;
 var height;
 var canvas;
@@ -38,9 +39,6 @@ function limitPinchZoom(s) {
 }
 
 function zoom(amount) {
-    if (request_in_progress) {
-        return;
-    }
 
     if (amount <= 0) {
         return;
@@ -55,9 +53,6 @@ function zoom(amount) {
 }
 
 function setLocation(x, y) {
-    if (request_in_progress) {
-        return;
-    }
 
     var complex = ViewToComplex(x, y);
     offset_x = complex[0];
@@ -65,6 +60,10 @@ function setLocation(x, y) {
 }
 
 function zoom_handler(event) {
+    if (request_in_progress) {
+        return;
+    }
+    request_in_progress = true;
 
     var delta = 0;
 
@@ -99,6 +98,11 @@ function dragStart(ev) {
     if (request_in_progress) {
         return;
     }
+    if (drag_in_progress) {
+        return;
+    }
+    drag_in_progress = true;
+    request_in_progress = true;
     StopColourLoop();
     width = canvas.width;
     height = canvas.height;
@@ -107,7 +111,7 @@ function dragStart(ev) {
 }
 
 function dragMove(ev) {
-    if (request_in_progress) {
+    if (!drag_in_progress) {
         return;
     }
     new_scale = limitPinchZoom(ev.scale);
@@ -131,13 +135,15 @@ function dragMove(ev) {
 }
 
 function dragEnd(ev) {
-    if (request_in_progress) {
+    if (!drag_in_progress) {
         return;
     }
     new_scale = limitPinchZoom(ev.scale);
 
     setLocation(width * 0.5 - ev.deltaX, height * 0.5 - ev.deltaY);
     zoom(new_scale);
+
+    drag_in_progress = false;
 }
 
 var isMobile = {
@@ -235,6 +241,7 @@ $(document).ready(function () {
 
     updateUrl();
 
+    canvas.addEventListener('touchstart', function (e) { e.preventDefault(); }, false);
     canvas.addEventListener('selectstart', function (e) { e.preventDefault(); }, false);
 });
 

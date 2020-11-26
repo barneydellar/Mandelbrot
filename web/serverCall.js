@@ -1,11 +1,10 @@
 //-------------------------------------------------------------------------------------
 
 function NewMandelbrot() {
-    if (request_in_progress) {
-        return;
-    }
-    StopColourLoop();
 
+    request_in_progress = true;
+
+    StopColourLoop();
     NewMandelbrotImp(4);
 }
 
@@ -14,8 +13,6 @@ function NewMandelbrotImp(factor) {
     zoom_factor = factor;
     fraction = 1 / zoom_factor;
 
-    request_in_progress = true;
-
     fetch(
         "/Mandelbrot",
         {
@@ -23,7 +20,7 @@ function NewMandelbrotImp(factor) {
             body: JSON.stringify({
                 canvas_width: Math.ceil(full_w * fraction),
                 canvas_height: Math.ceil(full_h * fraction),
-                scale: scale * 1.01,
+                scale: scale,
                 x: offset_x,
                 y: offset_y
             }),

@@ -2,8 +2,10 @@ var limit = 10000;
 
 
 function NewMandelbrot() {
+
+    request_in_progress = true;
     StopColourLoop();
-    NewMandelbrotImp(4);
+    NewMandelbrotImp(1);
 }
 function NewMandelbrotImp(factor) {
 
@@ -27,11 +29,10 @@ function NewMandelbrotImp(factor) {
 
 function GenerateEscapeValues(generate_width, generate_height) {
 
-    local_one_over_min_half = 1 / (scale * Math.min(generate_width, generate_height));
-
-
     local_half_w = generate_width * 0.5;
     local_half_h = generate_height * 0.5;
+
+    local_one_over_min_half = 1 / (scale * Math.min(local_half_w, local_half_h));
 
     function LocalViewToComplex(x, y) {
 

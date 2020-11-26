@@ -185,7 +185,7 @@ var zoom_factor = 1;
 
 function DrawCanvas() {
 
-    var canvasData = context.createImageData(full_w, full_h);
+    var canvasData = context.getImageData(0, 0, full_w, full_h);
     UpdateMainPalette();
 
     var colour;
@@ -241,12 +241,10 @@ function StartColourLoop() {
 
     // Start the tick function to change the colours
     StopColourLoop();
-
     interval_token = setInterval(function () { DrawCanvas(); }, 20);
 }
 
 //-------------------------------------------------------------------------------------
-
 
 function SetUpWithoutChangingThePalette() {
 
