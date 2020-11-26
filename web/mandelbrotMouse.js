@@ -207,7 +207,7 @@ $(document).ready(function () {
     });
 
     if (isMobile.any()) {
-        mc.get('pinch').set({ enable: true });
+        mc.get('pinch').set({ enable: true, threshold: 0 });
         mc.get('pan').set({ enable: false });
 
         mc.on("pinchstart", function (ev) {
@@ -222,7 +222,7 @@ $(document).ready(function () {
     } else {
 
         mc.get('pinch').set({ enable: false });
-        mc.get('pan').set({ enable: true });
+        mc.get('pan').set({ enable: true, threshold: 0 });
 
         mc.on("panstart", function (ev) {
             dragStart(ev);
