@@ -193,20 +193,23 @@ function DrawCanvas() {
 
     var fraction = 1 / zoom_factor;
 
+    var full_w_fraction = Math.ceil(full_w * fraction);
+
     for (j = 0; j < full_h; j++) {
+        var j_full_w_fraction = Math.ceil(j * fraction) * full_w_fraction;
+        var j_full_w = j * full_w;
+
         for (i = 0; i < full_w; i++) {
 
-            escape_index = Math.ceil(i * fraction) + Math.ceil(j * fraction) * Math.ceil(full_w * fraction);
-            canvas_index = 4 * (i + j * full_w);
+            escape_index = Math.ceil(i * fraction) + j_full_w_fraction;
+            canvas_index = 4 * (i + j_full_w);
 
             colour = GetColour(main_palette, main_palette_size, escape_array[escape_index]);
-
 
             canvasData.data[canvas_index + 0] = colour[0];
             canvasData.data[canvas_index + 1] = colour[1];
             canvasData.data[canvas_index + 2] = colour[2];
             canvasData.data[canvas_index + 3] = 255;
-
         }
     }
 
