@@ -198,9 +198,8 @@ $(document).ready(function () {
 
     mc.get('tap').set({ enable: false });
     mc.get('swipe').set({ enable: false });
-
-    mc.get('press').set({ enable: true });
-    mc.on("doubletap", function (ev) {
+    mc.get('press').set({ enable: true, time:1200});
+    mc.on("press", function (ev) {
         if (request_in_progress) {
             return;
         }
