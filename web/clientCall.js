@@ -4,8 +4,9 @@ var limit = 10000;
 function NewMandelbrot() {
 
     request_in_progress = true;
+    document.body.style.cursor = 'wait';
     StopColourLoop();
-    NewMandelbrotImp(1);
+    NewMandelbrotImp(4);
 }
 function NewMandelbrotImp(factor) {
 
@@ -18,6 +19,7 @@ function NewMandelbrotImp(factor) {
     if (factor == 1) {
         StartColourLoop();
         request_in_progress = false;
+        document.body.style.cursor = 'default';
         return;
     }
 
