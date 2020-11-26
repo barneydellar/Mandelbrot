@@ -6,14 +6,14 @@ function NewMandelbrot() {
     request_in_progress = true;
     document.body.style.cursor = 'wait';
     StopColourLoop();
-    NewMandelbrotImp(4);
+    NewMandelbrotImp(4, null);
 }
-function NewMandelbrotImp(factor) {
+function NewMandelbrotImp(factor, old_escape_array) {
 
     zoom_factor = factor;
     fraction = 1 / zoom_factor;
 
-    GenerateEscapeValues(Math.ceil(full_w * fraction), Math.ceil(full_h * fraction));
+    GenerateEscapeValues(Math.ceil(full_w * fraction), Math.ceil(full_h * fraction), old_escape_array);
     DrawCanvas();
 
     if (factor == 1) {
@@ -25,11 +25,11 @@ function NewMandelbrotImp(factor) {
 
     setTimeout(function () {
         factor = Math.round(factor / 2);
-        NewMandelbrotImp(factor);
+        NewMandelbrotImp(factor, Array.from(escape_array));
     }, 1);
 }
 
-function GenerateEscapeValues(generate_width, generate_height) {
+function GenerateEscapeValues(generate_width, generate_height, old_escape_array) {
 
     local_half_w = generate_width * 0.5;
     local_half_h = generate_height * 0.5;
@@ -67,9 +67,14 @@ function GenerateEscapeValues(generate_width, generate_height) {
         complex_x_iter_imag = complex_y_iter_imag;
 
         j_step = j * generate_width;
+        quarter_j_step = j_step / 4;
         for (i = 0; i < generate_width; i++) {
 
-            escape_array[i + j_step] = ComplexToMandelbrot(complex_x_iter_real, complex_x_iter_imag);;
+            if (old_escape_array && i % 2 == 0 && j % 2 == 0) {
+                escape_array[i + j_step] = old_escape_array[i / 2 + quarter_j_step];
+            } else {
+                escape_array[i + j_step] = ComplexToMandelbrot(complex_x_iter_real, complex_x_iter_imag);;
+            }
 
             complex_x_iter_real += step_x_real;
             complex_x_iter_imag += step_x_imag;
