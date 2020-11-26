@@ -210,7 +210,6 @@ function DrawCanvas() {
         }
     }
 
-    context.clearRect(0, 0, width, height);
     context.putImageData(canvasData, 0, 0);
 }
 
