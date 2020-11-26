@@ -200,7 +200,7 @@ $(document).ready(function () {
     mc.get('swipe').set({ enable: false });
 
     mc.get('press').set({ enable: true });
-    mc.on("press", function (ev) {
+    mc.on("doubletap", function (ev) {
         if (request_in_progress) {
             return;
         }

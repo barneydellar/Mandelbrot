@@ -42,7 +42,6 @@ function NewMandelbrotImp(factor) {
             }
             factor = Math.round(factor / 2);
             NewMandelbrotImp(factor);
-
         })
         .catch(function () {
             console.log("Failed to get data");
