@@ -247,6 +247,8 @@ $(document).ready(function () {
 $(window).resize(function () {
     width = canvas.width;
     height = canvas.height;
+    context = canvas.getContext("2d");
+    context.clearRect(0, 0, width, height);
     StopColourLoop();
     setTimeout(
         () => {
