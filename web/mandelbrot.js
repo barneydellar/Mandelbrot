@@ -148,6 +148,10 @@ function CreatePalette(size) {
 
 function GetColour(palette, palette_length, mandelbrot) {
 
+    if (mandelbrot == 0) {
+        return [0, 0, 0];
+    }
+
     if (mandelbrot < palette_length - 1) {
         return palette[mandelbrot];
     }
@@ -159,8 +163,7 @@ function GetColour(palette, palette_length, mandelbrot) {
 
 function UpdateMainPalette() {
     main_palette.unshift(main_palette.pop());
-    main_palette[0] = [0, 0, 0];
-    main_palette[1] = small_palette[palette_counter++];
+    main_palette[0] = small_palette[palette_counter++];
     if (palette_counter >= small_palette_size) {
         palette_counter = 0;
     }
@@ -168,7 +171,7 @@ function UpdateMainPalette() {
 
 function CopySmallPaletteIntoLargeOne() {
 
-    for (i = 1; i < main_palette_size; i++) {
+    for (i = 0; i < main_palette_size; i++) {
         main_palette[i] = [
             small_palette[i % small_palette_size][0],
             small_palette[i % small_palette_size][1],
@@ -204,12 +207,11 @@ function DrawCanvas() {
 
             colour = GetColour(main_palette, main_palette_size, escape_array[Math.ceil(escape_index)]);
 
-            canvasData.data[canvas_index + 0] = colour[0];
-            canvasData.data[canvas_index + 1] = colour[1];
-            canvasData.data[canvas_index + 2] = colour[2];
-            canvasData.data[canvas_index + 3] = 255;
+            canvasData.data[canvas_index++] = colour[0];
+            canvasData.data[canvas_index++] = colour[1];
+            canvasData.data[canvas_index++] = colour[2];
+            canvasData.data[canvas_index++] = 255;
 
-            canvas_index += 4;
             escape_index += fraction;
         }
         j_full_w_fraction += fraction;
@@ -244,7 +246,7 @@ function StopColourLoop() {
 function StartColourLoop() {
 
     // Start the tick function to change the colours
-    interval_token = setInterval(function () { DrawCanvas(); }, 20);
+    interval_token = setInterval(function () { DrawCanvas(); 20});
 }
 
 //-------------------------------------------------------------------------------------
@@ -278,7 +280,6 @@ function SetUp() {
     small_palette = CreatePalette(small_palette_size);
     main_palette = new Array(main_palette_size);
     CopySmallPaletteIntoLargeOne();
-    main_palette[0] = [0, 0, 0];
 
     SetUpWithoutChangingThePalette();
 
