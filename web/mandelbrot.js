@@ -108,6 +108,8 @@ function CreatePalette(size) {
     divisor = getRndBias(2, 100, 3, 1);
 
     loop_size = Math.ceil(size / divisor);
+    original_loop_size = loop_size;
+
 
     for (i = 0; i < size; i += loop_size) {
 
@@ -126,7 +128,12 @@ function CreatePalette(size) {
                 start_colour[2] * start_frac + end_colour[2] * end_frac
             ];
         }
-        start_colour = end_colour;
+
+        if (getRndBias(1, 5, 0, 0) == 1) {
+            start_colour = RandomColour(end_colour);
+        } else {
+            start_colour = end_colour;
+        }
 
         if (i + j + loop_size >= size) {
             end_colour = initial_colour;
@@ -151,18 +158,9 @@ function GetColour(palette, palette_length, mandelbrot) {
 //-------------------------------------------------------------------------------------
 
 function UpdateMainPalette() {
-
-    for (i = main_palette_size-1; i > 1; i--) {
-        main_palette[i] = [
-            main_palette[i - 1][0],
-            main_palette[i - 1][1],
-            main_palette[i - 1][2]
-        ];
-    }
-
-    main_palette[1] = small_palette[palette_counter];
-    palette_counter++;
-
+    main_palette.unshift(main_palette.pop());
+    main_palette[0] = [0, 0, 0];
+    main_palette[1] = small_palette[palette_counter++];
     if (palette_counter >= small_palette_size) {
         palette_counter = 0;
     }
