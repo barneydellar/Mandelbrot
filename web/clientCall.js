@@ -8,6 +8,7 @@ function NewMandelbrot() {
     StopColourLoop();
     NewMandelbrotImp(4, null);
 }
+
 function NewMandelbrotImp(factor, old_escape_array) {
 
     zoom_factor = factor;
@@ -19,12 +20,22 @@ function NewMandelbrotImp(factor, old_escape_array) {
     if (factor == 1) {
         StartColourLoop();
         request_in_progress = false;
+
         document.body.style.cursor = 'default';
+        resizeCount--;
         return;
     }
 
     setTimeout(function () {
+
+        if (resizeCount > 1) {
+            resizeCount--;
+            request_in_progress = false;
+            return;
+        }
+
         factor = Math.round(factor / 2);
+
         NewMandelbrotImp(factor, Array.from(escape_array));
     }, 1);
 }
@@ -60,21 +71,25 @@ function GenerateEscapeValues(generate_width, generate_height, old_escape_array)
 
     var i, j;
 
-    var j_step;
+    var main_step = 0;
+    var small_step = 0;
     for (j = 0; j < generate_height; j++) {
 
         complex_x_iter_real = complex_y_iter_real;
         complex_x_iter_imag = complex_y_iter_imag;
 
         j_step = j * generate_width;
-        quarter_j_step = j_step / 4;
+        quarter_j_step = Math.floor(j_step / 4);
         for (i = 0; i < generate_width; i++) {
 
             if (old_escape_array && i % 2 == 0 && j % 2 == 0) {
-                escape_array[i + j_step] = old_escape_array[i / 2 + quarter_j_step];
+                escape_array[main_step] = old_escape_array[small_step];
+                small_step++;
             } else {
-                escape_array[i + j_step] = ComplexToMandelbrot(complex_x_iter_real, complex_x_iter_imag);;
+                escape_array[main_step] = ComplexToMandelbrot(complex_x_iter_real, complex_x_iter_imag);;
             }
+
+            main_step++;
 
             complex_x_iter_real += step_x_real;
             complex_x_iter_imag += step_x_imag;

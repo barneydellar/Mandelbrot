@@ -12,6 +12,9 @@ var delta_y;
 var translation_factor;
 var imageObject = new Image();
 
+const zoom_in_limit = 100000000000;
+const zoom_out_limit = 0.2;
+
 //-------------------------------------------------------------------------------------
 
 function updateUrl() {
@@ -23,17 +26,17 @@ function updateUrl() {
 }
 
 function limitZoom(s) {
-    s = Math.min(s, 600000000000)
+    s = Math.min(s, zoom_in_limit)
     s = Math.max(s, 0.2)
     return s;
 }
 
 function limitPinchZoom(s) {
-    if (s * scale > 600000000000) {
-        s = 600000000000 / scale;
+    if (s * scale > zoom_in_limit) {
+        s = zoom_in_limit / scale;
     }
-    if (s * scale < 0.2) {
-        s = 0.2 / scale;
+    if (s * scale < zoom_out_limit) {
+        s = zoom_out_limit / scale;
     }
     return s;
 }
@@ -48,6 +51,7 @@ function zoom(amount) {
     scale = limitZoom(scale);
 
     one_over_min_half = 1 / (scale * Math.min(half_w, half_h));
+    resizeCount++;
     NewMandelbrot();
     updateUrl();
 }
@@ -244,12 +248,14 @@ $(document).ready(function () {
     canvas.addEventListener('selectstart', function (e) { e.preventDefault(); }, false);
 });
 
+var resizeCount = 0;
 $(window).resize(function () {
+    resizeCount++;
+    StopColourLoop();
     width = canvas.width;
     height = canvas.height;
     context = canvas.getContext("2d");
     context.clearRect(0, 0, width, height);
-    StopColourLoop();
     setTimeout(
         () => {
             SetUpWithoutChangingThePalette();

@@ -11,7 +11,7 @@ var context;
 
 
 var main_palette;
-var main_palette_size = 20000;
+var main_palette_size = 5000;
 
 var palette_counter = 0;
 var small_palette;
@@ -244,7 +244,6 @@ function StopColourLoop() {
 function StartColourLoop() {
 
     // Start the tick function to change the colours
-    StopColourLoop();
     interval_token = setInterval(function () { DrawCanvas(); }, 20);
 }
 
@@ -275,6 +274,7 @@ function SetUpWithoutChangingThePalette() {
 }
 
 function SetUp() {
+    resizeCount++;
     small_palette = CreatePalette(small_palette_size);
     main_palette = new Array(main_palette_size);
     CopySmallPaletteIntoLargeOne();
