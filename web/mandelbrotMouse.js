@@ -1,10 +1,6 @@
 
-var tpCache = new Array()
 var request_in_progress = false;
 var drag_in_progress = false;
-var width;
-var height;
-var canvas;
 
 var new_scale;
 var delta_x;
@@ -108,8 +104,8 @@ function dragStart(ev) {
     drag_in_progress = true;
     request_in_progress = true;
     StopColourLoop();
-    width = canvas.width;
-    height = canvas.height;
+    full_w = canvas.width;
+    full_h = canvas.height;
 
     imageObject.src = canvas.toDataURL();
 }
@@ -127,12 +123,12 @@ function dragMove(ev) {
         return;
     }
 
-    context.clearRect(0, 0, width, height);
+    context.clearRect(0, 0, full_w, full_h);
     context.save();
 
     translation_factor = (new_scale - 1) / (2 * new_scale);
     context.scale(new_scale, new_scale);
-    context.translate(delta_x - width * translation_factor, delta_y - height * translation_factor);
+    context.translate(delta_x - full_w * translation_factor, delta_y - full_h * translation_factor);
 
     context.drawImage(imageObject, 0, 0);
     context.restore();
@@ -144,7 +140,7 @@ function dragEnd(ev) {
     }
     new_scale = limitPinchZoom(ev.scale);
 
-    setLocation(width * 0.5 - ev.deltaX, height * 0.5 - ev.deltaY);
+    setLocation(full_w * 0.5 - ev.deltaX, full_h * 0.5 - ev.deltaY);
     zoom(new_scale);
 
     drag_in_progress = false;
@@ -189,12 +185,15 @@ $(document).ready(function () {
 
     canvas = document.getElementById('MandelbrotCanvas');
     canvas.style.background = "black";
+    canvas.width = window.innerWidth - 20;
+    canvas.height = window.innerHeight - 20;
+
     context = canvas.getContext("2d");
-    width = canvas.width;
-    height = canvas.height;
+    full_w = canvas.width;
+    full_h = canvas.height;
 
     imageObject.onload = function () {
-        context.clearRect(0, 0, width, height);
+        context.clearRect(0, 0, full_w, full_h);
         context.drawImage(imageObject, 0, 0);
     }
 
@@ -252,10 +251,14 @@ var resizeCount = 0;
 $(window).resize(function () {
     resizeCount++;
     StopColourLoop();
-    width = canvas.width;
-    height = canvas.height;
+
+    canvas.width = window.innerWidth - 20;
+    canvas.height = window.innerHeight - 20;
+
+    full_w = canvas.width;
+    full_h = canvas.height;
     context = canvas.getContext("2d");
-    context.clearRect(0, 0, width, height);
+    context.clearRect(0, 0, full_w, full_h);
     setTimeout(
         () => {
             SetUpWithoutChangingThePalette();

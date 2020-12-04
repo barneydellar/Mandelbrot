@@ -255,13 +255,6 @@ function SetUpWithoutChangingThePalette() {
 
     StopColourLoop();
 
-    // Set up some initial variables
-    var canvas = $("#MandelbrotCanvas")[0];
-    canvas.width = window.innerWidth - 20;
-    canvas.height = window.innerHeight - 20;
-    full_w = canvas.width;
-    full_h = canvas.height;
-
     // Create the array of escape values
     escape_array = new Array(full_w * full_h);
 
