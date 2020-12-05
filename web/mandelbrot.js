@@ -239,16 +239,16 @@ function DrawCanvasUnzoomed() {
     var canvas_index = 0;
     var escape_index = 0;
 
-    for (j = 0; j < full_h; j++) {
-        for (i = 0; i < full_w; i++) {
+    const width_height = full_w * full_h;
 
-            colour = GetColour(main_palette, main_palette_size, escape_array[escape_index++]);
+    for (i = 0; i < width_height; i++) {
 
-            canvasData.data[canvas_index++] = colour[0];
-            canvasData.data[canvas_index++] = colour[1];
-            canvasData.data[canvas_index++] = colour[2];
-            canvasData.data[canvas_index++] = 255;
-        }
+        colour = GetColour(main_palette, main_palette_size, escape_array[escape_index++]);
+
+        canvasData.data[canvas_index++] = colour[0];
+        canvasData.data[canvas_index++] = colour[1];
+        canvasData.data[canvas_index++] = colour[2];
+        canvasData.data[canvas_index++] = 255;
     }
 
     context.putImageData(canvasData, 0, 0);
