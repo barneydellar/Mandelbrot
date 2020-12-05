@@ -186,11 +186,21 @@ var zoom_factor = 1;
 
 function DrawCanvas() {
 
-    var canvasData = context.getImageData(0, 0, full_w, full_h);
     UpdateMainPalette();
 
+    if (zoom_factor === 1) {
+        DrawCanvasUnzoomed();
+    } else {
+        DrawCanvasZoomed();
+    }
+    var canvasData = context.getImageData(0, 0, full_w, full_h);
+}
+
+function DrawCanvasZoomed() {
+
+    var canvasData = context.getImageData(0, 0, full_w, full_h);
+
     var colour;
-    var canvas_index;
 
     var fraction = 1 / zoom_factor;
 
@@ -215,6 +225,30 @@ function DrawCanvas() {
             escape_index += fraction;
         }
         j_full_w_fraction += fraction;
+    }
+
+    context.putImageData(canvasData, 0, 0);
+}
+
+function DrawCanvasUnzoomed() {
+
+    var canvasData = context.getImageData(0, 0, full_w, full_h);
+
+    var colour;
+    
+    var canvas_index = 0;
+    var escape_index = 0;
+
+    for (j = 0; j < full_h; j++) {
+        for (i = 0; i < full_w; i++) {
+
+            colour = GetColour(main_palette, main_palette_size, escape_array[escape_index++]);
+
+            canvasData.data[canvas_index++] = colour[0];
+            canvasData.data[canvas_index++] = colour[1];
+            canvasData.data[canvas_index++] = colour[2];
+            canvasData.data[canvas_index++] = 255;
+        }
     }
 
     context.putImageData(canvasData, 0, 0);
