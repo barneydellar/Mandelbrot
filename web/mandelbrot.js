@@ -68,7 +68,7 @@ function RandomColourImp() {
         b_func = DimColourValue;
     }
 
-    return [r_func(), g_func(), b_func()];
+    return [r_func(), g_func(), b_func(), 255];
 }
 
 //-------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ function CreatePalette(size) {
 
     var palette = new Array(size);
 
-    start_colour = RandomColour([0, 0, 0]);
+    start_colour = RandomColour([0, 0, 0, 255]);
     end_colour = RandomColour(start_colour);
 
     initial_colour = start_colour;
@@ -109,7 +109,6 @@ function CreatePalette(size) {
 
     loop_size = Math.ceil(size / divisor);
     original_loop_size = loop_size;
-
 
     for (i = 0; i < size; i += loop_size) {
 
@@ -125,7 +124,8 @@ function CreatePalette(size) {
             palette[i + j] = [
                 start_colour[0] * start_frac + end_colour[0] * end_frac,
                 start_colour[1] * start_frac + end_colour[1] * end_frac,
-                start_colour[2] * start_frac + end_colour[2] * end_frac
+                start_colour[2] * start_frac + end_colour[2] * end_frac,
+                255
             ];
         }
 
@@ -149,7 +149,7 @@ function CreatePalette(size) {
 function GetColour(palette, palette_length, mandelbrot) {
 
     if (mandelbrot == 0) {
-        return [0, 0, 0];
+        return [0, 0, 0, 255];
     }
 
     if (mandelbrot < palette_length - 1) {
@@ -232,24 +232,9 @@ function DrawCanvasZoomed() {
 
 function DrawCanvasUnzoomed() {
 
-    var canvasData = context.getImageData(0, 0, full_w, full_h);
-
-    var colour;
-    
-    var canvas_index = 0;
-    var escape_index = 0;
-
-    const width_height = full_w * full_h;
-
-    for (i = 0; i < width_height; i++) {
-
-        colour = GetColour(main_palette, main_palette_size, escape_array[escape_index++]);
-
-        canvasData.data[canvas_index++] = colour[0];
-        canvasData.data[canvas_index++] = colour[1];
-        canvasData.data[canvas_index++] = colour[2];
-        canvasData.data[canvas_index++] = 255;
-    }
+    var canvasData = escape_array.map(function c(i) {
+        return GetColour(main_palette, main_palette_size, i);
+    });
 
     context.putImageData(canvasData, 0, 0);
 }
