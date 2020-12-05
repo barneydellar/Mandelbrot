@@ -11,11 +11,11 @@ var context;
 
 
 var main_palette;
-var main_palette_size = 5000;
+var main_palette_size = 10000;
 
 var palette_counter = 0;
 var small_palette;
-var small_palette_size = 800;
+var small_palette_size = 1600;
 
 
 var escape_array;
