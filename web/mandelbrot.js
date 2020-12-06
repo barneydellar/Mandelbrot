@@ -172,10 +172,12 @@ function UpdateMainPalette() {
 function CopySmallPaletteIntoLargeOne() {
 
     for (i = 0; i < main_palette_size; i++) {
+        var imod = i % small_palette_size;
         main_palette[i] = [
-            small_palette[i % small_palette_size][0],
-            small_palette[i % small_palette_size][1],
-            small_palette[i % small_palette_size][2]
+            small_palette[imod][0],
+            small_palette[imod][1],
+            small_palette[imod][2],
+            small_palette[imod][3]
         ];
     }
 }
@@ -230,13 +232,60 @@ function DrawCanvasZoomed() {
     context.putImageData(canvasData, 0, 0);
 }
 
+function arraysEqual(a, b) {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length !== b.length) return false;
+
+    // If you don't care about the order of the elements inside
+    // the array, you should sort both arrays here.
+    // Please note that calling sort on an array will modify that array.
+    // you might want to clone your array first.
+
+    for (var i = 0; i < a.length; ++i) {
+        if (a[i] !== b[i]) return false;
+    }
+    return true;
+}
+
+
 function DrawCanvasUnzoomed() {
 
-    var canvasData = escape_array.map(function c(i) {
-        return GetColour(main_palette, main_palette_size, i);
-    }).flat(1);
-   
+    var canvasData = context.getImageData(0, 0, full_w, full_h);
+
+    var colour;
+
+    var canvas_index = 0;
+    var escape_index = 0;
+
+    for (j = 0; j < full_h; j++) {
+        for (i = 0; i < full_w; i++) {
+
+            colour = GetColour(main_palette, main_palette_size, escape_array[escape_index++]);
+
+            canvasData.data[canvas_index++] = colour[0];
+            canvasData.data[canvas_index++] = colour[1];
+            canvasData.data[canvas_index++] = colour[2];
+            canvasData.data[canvas_index++] = 255;
+        }
+    }
+
+    //var unflattened = escape_array.map(function c(i) {
+    //    return GetColour(main_palette, main_palette_size, i);
+    //});
+    //var flattened = unflattened.flat(1);
+    //var ar8 = new Uint8ClampedArray(flattened);
+
+    //if (arraysEqual(canvasData.data, ar8)) {
+    //    console.log("ggf");
+    //} else {
+    //    console.log("rerewr");
+    //}
+
+    //canvasData.data = ar8;
+
     context.putImageData(canvasData, 0, 0);
+
 }
 
 //-------------------------------------------------------------------------------------
