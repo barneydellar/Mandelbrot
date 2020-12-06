@@ -234,8 +234,8 @@ function DrawCanvasUnzoomed() {
 
     var canvasData = escape_array.map(function c(i) {
         return GetColour(main_palette, main_palette_size, i);
-    });
-    canvasData.flat(1);
+    }).flat(1);
+   
     context.putImageData(canvasData, 0, 0);
 }
 
