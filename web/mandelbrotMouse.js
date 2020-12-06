@@ -82,6 +82,7 @@ function zoom_handler(event) {
     }
 
     StopColourLoop();
+    setLocation(event.offsetX, event.offsetY);
     zoom(amount);
 }
 
