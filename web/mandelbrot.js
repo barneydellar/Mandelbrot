@@ -68,7 +68,7 @@ function RandomColourImp() {
         b_func = DimColourValue;
     }
 
-    return [r_func(), g_func(), b_func(), 255];
+    return [r_func(), g_func(), b_func()];
 }
 
 //-------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ function CreatePalette(size) {
 
     var palette = new Array(size);
 
-    start_colour = RandomColour([0, 0, 0, 255]);
+    start_colour = RandomColour([0, 0, 0]);
     end_colour = RandomColour(start_colour);
 
     initial_colour = start_colour;
@@ -124,8 +124,7 @@ function CreatePalette(size) {
             palette[i + j] = [
                 start_colour[0] * start_frac + end_colour[0] * end_frac,
                 start_colour[1] * start_frac + end_colour[1] * end_frac,
-                start_colour[2] * start_frac + end_colour[2] * end_frac,
-                255
+                start_colour[2] * start_frac + end_colour[2] * end_frac
             ];
         }
 
@@ -146,17 +145,16 @@ function CreatePalette(size) {
 
 //-------------------------------------------------------------------------------------
 
-function GetColour(palette, palette_length, mandelbrot) {
-
+function GetColour(mandelbrot) {
     if (mandelbrot == 0) {
-        return [0, 0, 0, 255];
+        return [0, 0, 0];
     }
 
-    if (mandelbrot < palette_length - 1) {
-        return palette[mandelbrot];
+    if (mandelbrot < main_palette_size - 1) {
+        return main_palette[mandelbrot];
     }
 
-    return palette[palette_length - 1];
+    return main_palette[main_palette_size - 1];
 }
 
 //-------------------------------------------------------------------------------------
@@ -217,7 +215,7 @@ function DrawCanvasZoomed() {
 
         for (i = 0; i < full_w; i++) {
 
-            colour = GetColour(main_palette, main_palette_size, escape_array[Math.ceil(escape_index)]);
+            colour = GetColour(escape_array[Math.ceil(escape_index)]);
 
             canvasData.data[canvas_index++] = colour[0];
             canvasData.data[canvas_index++] = colour[1];
@@ -232,60 +230,27 @@ function DrawCanvasZoomed() {
     context.putImageData(canvasData, 0, 0);
 }
 
-function arraysEqual(a, b) {
-    if (a === b) return true;
-    if (a == null || b == null) return false;
-    if (a.length !== b.length) return false;
-
-    // If you don't care about the order of the elements inside
-    // the array, you should sort both arrays here.
-    // Please note that calling sort on an array will modify that array.
-    // you might want to clone your array first.
-
-    for (var i = 0; i < a.length; ++i) {
-        if (a[i] !== b[i]) return false;
-    }
-    return true;
-}
-
-
 function DrawCanvasUnzoomed() {
 
     var canvasData = context.getImageData(0, 0, full_w, full_h);
 
-    var colour;
+    var escape_colours = escape_array.map(GetColour);
 
     var canvas_index = 0;
     var escape_index = 0;
+    var colour;
+    var full_w_h = full_w * full_h;
+    for (i = 0; i < full_w_h; i++) {
 
-    for (j = 0; j < full_h; j++) {
-        for (i = 0; i < full_w; i++) {
+        colour = escape_colours[escape_index++];
 
-            colour = GetColour(main_palette, main_palette_size, escape_array[escape_index++]);
-
-            canvasData.data[canvas_index++] = colour[0];
-            canvasData.data[canvas_index++] = colour[1];
-            canvasData.data[canvas_index++] = colour[2];
-            canvasData.data[canvas_index++] = 255;
-        }
+        canvasData.data[canvas_index++] = colour[0];
+        canvasData.data[canvas_index++] = colour[1];
+        canvasData.data[canvas_index++] = colour[2];
+        canvasData.data[canvas_index++] = 255;
     }
 
-    //var unflattened = escape_array.map(function c(i) {
-    //    return GetColour(main_palette, main_palette_size, i);
-    //});
-    //var flattened = unflattened.flat(1);
-    //var ar8 = new Uint8ClampedArray(flattened);
-
-    //if (arraysEqual(canvasData.data, ar8)) {
-    //    console.log("ggf");
-    //} else {
-    //    console.log("rerewr");
-    //}
-
-    //canvasData.data = ar8;
-
     context.putImageData(canvasData, 0, 0);
-
 }
 
 //-------------------------------------------------------------------------------------
