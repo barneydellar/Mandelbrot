@@ -15,7 +15,7 @@ var main_palette_size = 10000;
 
 var palette_counter = 0;
 var small_palette;
-var small_palette_size = 1600;
+var small_palette_size = 800;
 
 
 var escape_array;
@@ -183,6 +183,7 @@ function CopySmallPaletteIntoLargeOne() {
 //-------------------------------------------------------------------------------------
 
 var zoom_factor = 1;
+//var old_time = +new Date();
 
 function DrawCanvas() {
 
@@ -194,6 +195,14 @@ function DrawCanvas() {
         DrawCanvasZoomed();
     }
     var canvasData = context.getImageData(0, 0, full_w, full_h);
+
+    //var new_time = +new Date();
+    //var diff = new_time - old_time;
+    //var fps = 1000 / diff;
+    //context.font = "12px Arial";
+    //context.fillStyle = "#FFFFFF";
+    //context.fillText(fps.toFixed(0) + " fps", 10, 20);
+    //old_time = new_time;
 }
 
 function DrawCanvasZoomed() {
@@ -234,15 +243,13 @@ function DrawCanvasUnzoomed() {
 
     var canvasData = context.getImageData(0, 0, full_w, full_h);
 
-    var escape_colours = escape_array.map(GetColour);
-
     var canvas_index = 0;
     var escape_index = 0;
     var colour;
     var full_w_h = full_w * full_h;
     for (i = 0; i < full_w_h; i++) {
 
-        colour = escape_colours[escape_index++];
+        colour = GetColour(escape_array[escape_index++]);
 
         canvasData.data[canvas_index++] = colour[0];
         canvasData.data[canvas_index++] = colour[1];
