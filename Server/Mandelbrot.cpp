@@ -44,7 +44,7 @@ int Mandelbrot::ComplexToMandelbrot(const complex& c) const {
         const auto r = zr - zi + cr;
         const auto i = w - zr - zi + ci;
 
-        if (std::pow(derived_r, 2) + std::pow(derived_i, 2) < 1e-12L) {
+        if (derived_r*derived_r + derived_i*derived_i < 1e-12L) {
             return 0;
         }
 
@@ -52,11 +52,11 @@ int Mandelbrot::ComplexToMandelbrot(const complex& c) const {
         derived_i = 2 * (derived_r * i + derived_i * r);
         derived_r = new_derived_r;
 
-        zr = std::pow(r, 2);
-        zi = std::pow(i, 2);
+        zr = r*r;
+        zi = i*i;
 
         const auto r_plus_i = r + i;
-        w = std::pow(r_plus_i, 2);
+        w = r_plus_i*r_plus_i;
 
         const auto mag = zr + zi;
 

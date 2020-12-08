@@ -183,9 +183,10 @@ function CopySmallPaletteIntoLargeOne() {
 //-------------------------------------------------------------------------------------
 
 var zoom_factor = 1;
-//var old_time = +new Date();
 
+var old_time;
 function DrawCanvas() {
+
 
     UpdateMainPalette();
 
@@ -196,13 +197,13 @@ function DrawCanvas() {
     }
     var canvasData = context.getImageData(0, 0, full_w, full_h);
 
-    //var new_time = +new Date();
-    //var diff = new_time - old_time;
+    var new_time = +new Date();
+    var diff = new_time - old_time;
     //var fps = 1000 / diff;
-    //context.font = "12px Arial";
-    //context.fillStyle = "#FFFFFF";
-    //context.fillText(fps.toFixed(0) + " fps", 10, 20);
-    //old_time = new_time;
+    context.font = "16px Arial";
+    context.fillStyle = "#FFFFFF";
+    context.fillText(diff + " ms", 10, 20);
+    old_time = new_time;
 }
 
 function DrawCanvasZoomed() {
@@ -286,7 +287,7 @@ function StopColourLoop() {
 function StartColourLoop() {
 
     // Start the tick function to change the colours
-    interval_token = setInterval(function () { DrawCanvas(); 20});
+    interval_token = setInterval(function () { DrawCanvas(); }, 40);
 }
 
 //-------------------------------------------------------------------------------------

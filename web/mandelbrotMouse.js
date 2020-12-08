@@ -60,6 +60,7 @@ function setLocation(x, y) {
 }
 
 function zoom_handler(event) {
+
     if (request_in_progress) {
         return;
     }
@@ -78,10 +79,12 @@ function zoom_handler(event) {
     if (delta > 0) {
         amount = delta;
     } else {
-        amount = -1/delta;
+        amount = -1 / delta;
     }
 
     StopColourLoop();
+
+    old_time = +new Date();
     setLocation(event.offsetX, event.offsetY);
     zoom(amount);
 }
@@ -102,6 +105,7 @@ function dragStart(ev) {
     if (drag_in_progress) {
         return;
     }
+
     drag_in_progress = true;
     request_in_progress = true;
     StopColourLoop();
@@ -141,6 +145,7 @@ function dragEnd(ev) {
     }
     new_scale = limitPinchZoom(ev.scale);
 
+    old_time = +new Date();
     setLocation(full_w * 0.5 - ev.deltaX, full_h * 0.5 - ev.deltaY);
     zoom(new_scale);
 
@@ -202,12 +207,14 @@ $(document).ready(function () {
 
     mc.get('tap').set({ enable: false });
     mc.get('swipe').set({ enable: false });
-    mc.get('press').set({ enable: true, time:1200});
+    mc.get('press').set({ enable: true, time: 1200 });
     mc.on("press", function (ev) {
         if (request_in_progress) {
             return;
         }
+        old_time = +new Date();
         newPalette();
+        DrawCanvas();
     });
 
     if (isMobile.any()) {
@@ -240,12 +247,14 @@ $(document).ready(function () {
         document.onmousewheel = zoom_handler;
     }
 
+    old_time = +new Date();
     SetUp();
 
     updateUrl();
 
     canvas.addEventListener('touchstart', function (e) { e.preventDefault(); }, false);
     canvas.addEventListener('selectstart', function (e) { e.preventDefault(); }, false);
+
 });
 
 var resizeCount = 0;
